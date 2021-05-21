@@ -118,5 +118,10 @@
       <version>6.10.4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jmolecules</groupId>
+      <artifactId>jmolecules-ddd</artifactId>
+      <version>1.2.0</version>
+    </dependency>
   </dependencies>
 </project>
