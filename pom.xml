@@ -39,6 +39,16 @@
         <artifactId>kotlin-maven-plugin</artifactId>
         <!--suppress DifferentKotlinMavenVersion -->
         <version>${kotlin.version}</version>
+        <configuration>
+          <compilerPlugins>
+            <plugin>all-open</plugin>
+          </compilerPlugins>
+          <pluginOptions>
+            <option>all-open:annotation=javax.persistence.Entity</option>
+            <option>all-open:annotation=javax.persistence.Embeddable</option>
+            <option>all-open:annotation=javax.persistence.MappedSuperclass</option>
+          </pluginOptions>
+        </configuration>
         <executions>
           <execution>
             <id>compile</id>
@@ -55,6 +65,7 @@
             </goals>
           </execution>
         </executions>
+
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
