@@ -1,18 +1,21 @@
 package yummi
 
-import io.kotest.matchers.shouldNotBe
+import com.fasterxml.jackson.databind.JsonNode
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.ApplicationContext
+import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.test.web.client.getForEntity
+import org.springframework.http.HttpStatus
 
-@SpringBootTest(useMainMethod = SpringBootTest.UseMainMethod.WHEN_AVAILABLE)
-internal class YummiApplicationIT(
-    @Autowired private val ctx: ApplicationContext
-) {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class YummiApplicationIT(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
-    internal fun `application context starts`() {
-        ctx shouldNotBe null
+    internal fun `can request menu per GET`() {
+        val response = restTemplate.getForEntity<JsonNode>("/menu")
+        assertThat(response.statusCode, equalTo(HttpStatus.OK))
     }
 }
