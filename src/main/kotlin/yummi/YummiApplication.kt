@@ -1,11 +1,11 @@
-package tdd.sandbox
+package yummi
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-open class SandboxApplication
+class YummiApplication
 
 fun main(args: Array<String>) {
-    runApplication<SandboxApplication>(*args)
+    runApplication<YummiApplication>(*args)
 }
