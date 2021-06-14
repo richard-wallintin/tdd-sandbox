@@ -4,5 +4,21 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
-  <changeSet author="none" id="change-001"/>
+  <changeSet author="mob" id="change-001">
+    <createSequence sequenceName="PERSISTENT_OFFER_SEQ" startValue="1" incrementBy="1"/>
+    <createTable tableName="PERSISTENT_OFFER">
+      <column name="ID" type="bigint">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="FLAVOR" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="PRICE_IN_EUROS" type="decimal">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SIZE" type="smallint">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
 </databaseChangeLog>
