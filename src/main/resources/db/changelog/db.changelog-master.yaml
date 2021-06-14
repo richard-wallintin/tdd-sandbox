@@ -1,7 +1,5 @@
 databaseChangeLog:
 # this first changeset is here only for luquibase not to fail
 # replace it with your first actual changeset...
-  - changeset:
-      id: 1
-      changes:
-        - empty: {}
+- include:
+    file: db/changelog/db.change-001.xml
