@@ -17,7 +17,7 @@
     <kotlin.compiler.jvmTarget>15</kotlin.compiler.jvmTarget>
     <maven.compiler.source>15</maven.compiler.source>
     <maven.compiler.target>15</maven.compiler.target>
-    <kotlin.version>1.4.32</kotlin.version>
+    <kotlin.version>1.5.10</kotlin.version>
     <junit.version>5.6.0</junit.version>
   </properties>
 
