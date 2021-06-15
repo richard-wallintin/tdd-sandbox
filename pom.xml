@@ -13,12 +13,13 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.level>16</java.level>
     <kotlin.code.style>official</kotlin.code.style>
-    <kotlin.compiler.jvmTarget>15</kotlin.compiler.jvmTarget>
-    <maven.compiler.source>15</maven.compiler.source>
-    <maven.compiler.target>15</maven.compiler.target>
+    <kotlin.compiler.jvmTarget>${java.level}</kotlin.compiler.jvmTarget>
+    <maven.compiler.source>${java.level}</maven.compiler.source>
+    <maven.compiler.target>${java.level}</maven.compiler.target>
     <kotlin.version>1.5.10</kotlin.version>
-    <junit.version>5.6.0</junit.version>
+    <junit.version>5.7.2</junit.version>
   </properties>
 
   <repositories>
