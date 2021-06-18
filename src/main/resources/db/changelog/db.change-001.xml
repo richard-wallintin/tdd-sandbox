@@ -4,5 +4,14 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
-  <changeSet author="none" id="change-001"/>
+  <changeSet author="none" id="change-001">
+    <createTable tableName="EINTRAG">
+      <column name="SORTE" type="varchar(100)">
+          <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="PREIS" type="decimal">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
 </databaseChangeLog>
