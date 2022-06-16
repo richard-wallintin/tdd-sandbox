@@ -13,14 +13,15 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.level>16</java.level>
+    <java.level>17</java.level>
     <kotlin.code.style>official</kotlin.code.style>
     <kotlin.compiler.jvmTarget>${java.level}</kotlin.compiler.jvmTarget>
     <maven.compiler.source>${java.level}</maven.compiler.source>
     <maven.compiler.target>${java.level}</maven.compiler.target>
-    <kotlin.version>1.5.10</kotlin.version>
-    <junit.version>5.7.2</junit.version>
-    <lombok.version>1.18.20</lombok.version>
+    <kotlin.version>1.7.0</kotlin.version>
+    <junit.version>5.8.2</junit.version>
+    <lombok.version>1.18.24</lombok.version>
+    <cucumber-java.version>7.3.3</cucumber-java.version>
   </properties>
 
   <repositories>
@@ -168,31 +169,31 @@
     <dependency>
       <groupId>com.natpryce</groupId>
       <artifactId>hamkrest</artifactId>
-      <version>1.7.0.0</version>
+      <version>1.8.0.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.mockk</groupId>
       <artifactId>mockk</artifactId>
-      <version>1.11.0</version>
+      <version>1.12.4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
-      <version>6.10.4</version>
+      <version>${cucumber-java.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-junit-platform-engine</artifactId>
-      <version>6.10.4</version>
+      <version>${cucumber-java.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>3.9.0</version>
+      <version>4.6.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -210,7 +211,7 @@
     <dependency>
       <groupId>org.jmolecules</groupId>
       <artifactId>jmolecules-ddd</artifactId>
-      <version>1.2.0</version>
+      <version>1.5.0</version>
     </dependency>
   </dependencies>
 </project>
