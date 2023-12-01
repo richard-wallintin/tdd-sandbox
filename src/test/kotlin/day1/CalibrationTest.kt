@@ -18,29 +18,33 @@ class CalibrationTest {
 
     @Test
     fun `part 1`() {
-        input.lineSequence().map { it.extractCalibrationValue() }.sum() shouldBe 55090
+        input.lineSequence().map { it.extractCalibrationValue() }.sum() shouldBe 55_090
     }
 
     @Test
     fun `detect named  digits`() {
         "two1nine".extractCalibrationValue2() shouldBe 29
         "eightwothree".extractCalibrationValue2() shouldBe 83
+        "eighthree".extractCalibrationValue2() shouldBe 83
 
         """
-            two1nine
-            eightwothree
-            abcone2threexyz
-            xtwone3four
-            4nineeightseven2
-            zoneight234
-            7pqrstsixteen
-        """.trimIndent().lineSequence().map { it.extractCalibrationValue2() }.sum() shouldBe 281
+                two1nine
+                eightwothree
+                abcone2threexyz
+                xtwone3four
+                4nineeightseven2
+                zoneight234
+                7pqrstsixteen
+            """.trimIndent().calibrationSum2() shouldBe 281
     }
 
     @Test
     fun `part two`() {
-        input.lineSequence().map { it.extractCalibrationValue2() }.sum() shouldBe 54_871
+        input.calibrationSum2() shouldBe 54_845
     }
+
+    private fun String.calibrationSum2() =
+        this.lineSequence().map { it.extractCalibrationValue2() }.sum()
 
     private fun String.extractCalibrationValue() = toList()
         .filter { it.isDigit() }
@@ -63,7 +67,7 @@ class CalibrationTest {
         val expression = digits.keys.joinToString("|")
         val regex = Regex(expression)
 
-        return regex.findAll(this).toList().let {
+        return regex.findAllWithOverlap(this).toList().let {
             it.first().value.asDigit() to it.last().value.asDigit()
         }.also { println(this to it) }
             .let {
@@ -73,6 +77,13 @@ class CalibrationTest {
 
     private fun String.asDigit(): Int {
         return digits[this]!!
+    }
+
+    fun Regex.findAllWithOverlap(input: CharSequence, startIndex: Int = 0): Sequence<MatchResult> {
+        if (startIndex < 0 || startIndex > input.length) {
+            throw IndexOutOfBoundsException("Start index out of bounds: $startIndex, input length: ${input.length}")
+        }
+        return generateSequence({ find(input, startIndex) },  { find(input, it.range.first + 1) })
     }
 }
 
