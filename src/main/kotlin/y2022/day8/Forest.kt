@@ -40,7 +40,7 @@ data class Forest(val h: List<List<Int>> = listOf()) {
         val right = toTheRight(col, row).viewingDistance(height)
         val bottom = toTheBottom(row, col).viewingDistance(height)
 
-        return left * top * right * bottom;
+        return left * top * right * bottom
     }
 
     private fun List<Int>.viewingDistance(height: Int): Int {
