@@ -4,31 +4,6 @@ import day4.ScratchCard.Companion.pileWorth
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
-fun Int.pow(exp: Int): Int = if (exp == 0) 1 else (this * this.pow(exp - 1))
-
-data class ScratchCard(val no: Int, val winning: Set<Int>, val select: Set<Int>) {
-    val winningNumbers = select.count { it in winning }
-    val worth = if (winningNumbers > 0) 2.pow(winningNumbers - 1) else 0
-
-    companion object {
-        fun of(s: String): ScratchCard =
-            Regex("Card\\s+(\\d+):\\s+((?:\\d+\\s+)+)\\|((?:\\s+\\d+)+\\s*)").matchEntire(s)?.destructured?.let { (no, winning, select) ->
-                ScratchCard(
-                    no = no.toInt(),
-                    winning = winning.numbers(),
-                    select = select.numbers(),
-                )
-            } ?: throw IllegalArgumentException("cant parse $s")
-
-
-        private fun String.numbers() =
-            split(Regex("\\s+")).filter { it.isNotBlank() }.map { it.toInt() }.toSet()
-
-        fun String.pileWorth() = lineSequence().map { ScratchCard.of(it).worth }.sum()
-    }
-
-}
-
 class ScratchCardTest {
 
     private val card1 = ScratchCard(
@@ -52,7 +27,8 @@ class ScratchCardTest {
     }
 
     @Test
-    fun worth() {
+    fun `winning cards and worth`() {
+        card1.winCount shouldBe 4
         card1.worth shouldBe 8
     }
 
@@ -61,8 +37,20 @@ class ScratchCardTest {
         refData.pileWorth() shouldBe 13
     }
 
+    private val aocInput = AOC.getInput("/day4.txt")
+
     @Test
     fun `part 1`() {
-        AOC.getInput("/day4.txt").pileWorth() shouldBe 22_897
+        aocInput.pileWorth() shouldBe 22_897
+    }
+
+    @Test
+    fun `pile multiplication`() {
+        Pile.of(refData).totalCards shouldBe 30
+    }
+
+    @Test
+    fun `part two`() {
+        Pile.of(aocInput).totalCards shouldBe 5_095_824
     }
 }
