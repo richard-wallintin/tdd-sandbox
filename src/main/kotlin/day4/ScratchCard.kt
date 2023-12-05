@@ -1,6 +1,7 @@
 package day4
 
-private fun Int.power(exp: Int): Int = if (exp == 0) 1 else (this * this.power(exp - 1))
+import util.integers
+import util.power
 
 data class ScratchCard(val no: Int, val winning: Set<Int>, val select: Set<Int>) {
     val winCount = select.count { it in winning }
@@ -11,14 +12,11 @@ data class ScratchCard(val no: Int, val winning: Set<Int>, val select: Set<Int>)
             Regex("Card\\s+(\\d+):\\s+((?:\\d+\\s+)+)\\|((?:\\s+\\d+)+\\s*)").matchEntire(s)?.destructured?.let { (no, winning, select) ->
                 ScratchCard(
                     no = no.toInt(),
-                    winning = winning.numbers(),
-                    select = select.numbers(),
+                    winning = winning.integers().toSet(),
+                    select = select.integers().toSet(),
                 )
             } ?: throw IllegalArgumentException("cant parse $s")
 
-
-        private fun String.numbers() =
-            split(Regex("\\s+")).filter { it.isNotBlank() }.map { it.toInt() }.toSet()
 
         fun String.pileWorth() = lineSequence().map { of(it).worth }.sum()
     }
