@@ -17,3 +17,4 @@ fun <T> Sequence<T>.chunkedBy(predicate: (T) -> Boolean) = sequence<List<T>> {
     }
     if (collect.isNotEmpty()) yield(collect)
 }
+
