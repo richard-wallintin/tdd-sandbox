@@ -1,8 +1,11 @@
 package day5
 
+import AOC
+import day5.Almanac.Companion.seedRanges
 import day5.Almanac.Companion.seeds
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class GardenTest {
@@ -69,21 +72,40 @@ class GardenTest {
 
     @Test
     fun `read items`() {
-        referenceData.seeds() shouldBe listOf(79, 14, 55, 13)
+        referenceData.seeds().toList() shouldBe listOf(79, 14, 55, 13)
     }
 
     @Test
     fun `read seeds and all mappings (almanac)`() {
         val almanac = Almanac.read(referenceData)
-        almanac.seeds shouldBe listOf(79, 14, 55, 13)
+        almanac.seeds.toList() shouldBe listOf(79, 14, 55, 13)
         almanac.mappings shouldHaveSize 7
-        almanac.locations shouldBe listOf(82, 43, 86, 35)
+        almanac.locations.toList() shouldBe listOf(82, 43, 86, 35)
         almanac.locations.min() shouldBe 35
     }
 
+    private val aocInput = AOC.getInput("/day5.txt")
+
     @Test
     fun `part 1`() {
-        Almanac.read(AOC.getInput("/day5.txt")).locations.min() shouldBe 199602917L
+        Almanac.read(aocInput).locations.min() shouldBe 199602917L
+    }
+
+    @Test
+    fun seedRanges() {
+        "seeds: 79 14 55 13".seedRanges().toList() shouldBe (
+                79..92
+                ) + (55..67)
+    }
+
+    @Test
+    fun `part 2 reference`() {
+        Almanac.read(referenceData, seedRanges = true).locations.min() shouldBe 46
+    }
+
+    @Test @Disabled("very slow test, takes ca. 8 minutes to execute")
+    fun `part 2 final`() {
+        Almanac.read(aocInput, seedRanges = true).locations.min() shouldBe 2_254_686L
     }
 
     private val referenceData = """
