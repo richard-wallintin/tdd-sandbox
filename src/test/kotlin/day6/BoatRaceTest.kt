@@ -1,10 +1,10 @@
 package day6
 
+import AOC
 import day6.Boat.Companion.margin
 import day6.Boat.Companion.size
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import util.integers
 
 
 class BoatRaceTest {
