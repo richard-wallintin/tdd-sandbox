@@ -1,7 +1,9 @@
 package day8
 
+import AOC
 import day8.Direction.Companion.navigationInstructions
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class DesertTest {
@@ -65,22 +67,56 @@ class DesertTest {
 
     @Test
     fun `find zzz`() {
-        val (network, directions) = parseNetworkAndDirections("""
+        val (network, directions) = parseNetworkAndDirections(
+            """
             LLR
 
             AAA = (BBB, BBB)
             BBB = (AAA, ZZZ)
             ZZZ = (ZZZ, ZZZ)
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         network.find("AAA", "ZZZ", directions) shouldBe 6
     }
 
+    private val aocInput = AOC.getInput("/day8.txt")
+
     @Test
     fun `part one`() {
-        val (n,d) = parseNetworkAndDirections(AOC.getInput("/day8.txt"))
+        val (n, d) = parseNetworkAndDirections(aocInput)
 
-        n.find("AAA","ZZZ", d) shouldBe 21_251
+        n.find("AAA", "ZZZ", d) shouldBe 21_251
+    }
+
+    private val startNode: NodeSelector = { it.id.endsWith("A") }
+    private val endeNode: NodeSelector = { it.id.endsWith("Z") }
+
+    @Test
+    fun `simultaneous navigation`() {
+        val (n, d) = parseNetworkAndDirections(
+            """
+            LR
+
+            11A = (11B, XXX)
+            11B = (XXX, 11Z)
+            11Z = (11B, XXX)
+            22A = (22B, XXX)
+            22B = (22C, 22C)
+            22C = (22Z, 22Z)
+            22Z = (22B, 22B)
+            XXX = (XXX, XXX)
+        """.trimIndent()
+        )
+
+        n.navigate(startNode, d).map(Node::id) shouldBe listOf("11Z", "22C")
+        n.find(startNode, endeNode, d) shouldBe 6
+    }
+
+    @Test
+    fun `part 2`() {
+        val (n, d) = parseNetworkAndDirections(aocInput)
+        n.find(startNode, endeNode, d) shouldBe 42
     }
 }
 
