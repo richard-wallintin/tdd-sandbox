@@ -3,8 +3,8 @@ package day8
 import AOC
 import day8.Direction.Companion.navigationInstructions
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.math.BigInteger
 
 class DesertTest {
 
@@ -90,33 +90,48 @@ class DesertTest {
     }
 
     private val startNode: NodeSelector = { it.id.endsWith("A") }
-    private val endeNode: NodeSelector = { it.id.endsWith("Z") }
+    private val endNode: NodeSelector = { it.id.endsWith("Z") }
+
+    private val referenceInput2 = """
+                LR
+    
+                11A = (11B, XXX)
+                11B = (XXX, 11Z)
+                11Z = (11B, XXX)
+                22A = (22B, XXX)
+                22B = (22C, 22C)
+                22C = (22Z, 22Z)
+                22Z = (22B, 22B)
+                XXX = (XXX, XXX)
+            """.trimIndent()
 
     @Test
     fun `simultaneous navigation`() {
-        val (n, d) = parseNetworkAndDirections(
-            """
-            LR
-
-            11A = (11B, XXX)
-            11B = (XXX, 11Z)
-            11Z = (11B, XXX)
-            22A = (22B, XXX)
-            22B = (22C, 22C)
-            22C = (22Z, 22Z)
-            22Z = (22B, 22B)
-            XXX = (XXX, XXX)
-        """.trimIndent()
-        )
+        val (n, d) = parseNetworkAndDirections(referenceInput2)
 
         n.navigate(startNode, d).map(Node::id) shouldBe listOf("11Z", "22C")
-        n.find(startNode, endeNode, d) shouldBe 6
+        n.find(startNode, endNode, d) shouldBe BigInteger.valueOf(6)
     }
 
     @Test
     fun `part 2`() {
         val (n, d) = parseNetworkAndDirections(aocInput)
-        n.find(startNode, endeNode, d) shouldBe 42
+        n.find(startNode, endNode, d) shouldBe BigInteger("11678319315857")
+
+    }
+
+    @Test
+    fun `find path length to endNodes`() {
+        val (n, d) = parseNetworkAndDirections(aocInput)
+
+        n.find("DPA", endNode, d) shouldBe 16409L
+        n.find("GGZ", endNode, d) shouldBe 16409L
+
+        n.find("JPA", endNode, d) shouldBe 11567L
+        n.find("MCZ", endNode, d) shouldBe 11567L
+
+        n.find("DBA", endNode, d) shouldBe 18023
+        n.find("TPZ", endNode, d) shouldBe 18023L
     }
 }
 

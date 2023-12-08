@@ -1,5 +1,7 @@
 package day8
 
+import java.math.BigInteger
+
 enum class Direction(val go: (Node) -> String) {
     L(Node::left), R(Node::right);
 
@@ -7,6 +9,12 @@ enum class Direction(val go: (Node) -> String) {
         fun String.navigationInstructions() =
             toList().map(Char::toString).map(Direction::valueOf)
     }
+}
+
+fun lcm(a: BigInteger, b: BigInteger?): BigInteger {
+    val gcd = a.gcd(b)
+    val absProduct = a.multiply(b).abs()
+    return absProduct.divide(gcd)
 }
 
 typealias NodeSelector = (Node) -> Boolean
@@ -26,39 +34,45 @@ class Network(val nodes: Map<String, Node>) {
     private fun String.node() = let(nodes::getValue)
     private fun NodeSelector.nodes() = nodes.values.filter(this)
 
-    fun find(startNodeId: String, endNodeId: String, directions: List<Direction>): Int {
+    private fun move(nodes: List<Node>, d: Direction) = nodes.map { move(it, d) }
+
+    fun navigate(startNodes: NodeSelector, directions: List<Direction>): List<Node> {
+        return directions.fold(startNodes.nodes(), ::move)
+    }
+
+    fun find(startNodeId: String, endNodeId: String, directions: List<Direction>): Long {
+        return find(startNodeId, { it.id == endNodeId }, directions)
+    }
+
+    fun find(startNodeId: String, endNodes: NodeSelector, directions: List<Direction>): Long {
+        return find(startNodeId.node(), endNodes, directions)
+    }
+
+    private fun find(
+        node: Node,
+        endNodes: NodeSelector,
+        directions: List<Direction>
+    ): Long {
         directions.foreverRepeating().withIndex()
-            .fold(startNodeId.node()) { currentNode, step ->
-                if (currentNode.id == endNodeId) return@find step.index
+            .fold(node) { currentNode, step ->
+                if (step.index > 0 && endNodes(currentNode)) return@find step.index.toLong()
                 else move(currentNode, step.value)
             }.let {
                 throw IllegalStateException("result after infinite folding: $it")
             }
     }
 
-    fun navigate(startNodes: NodeSelector, directions: List<Direction>): List<Node> {
-        return directions.fold(startNodes.nodes(), ::move)
+    fun find(
+        startNodes: NodeSelector,
+        endNodes: NodeSelector,
+        directions: List<Direction>
+    ): BigInteger {
+        val initial = startNodes.nodes()
+
+        return initial.map {
+            find(it, endNodes, directions)
+        }.map(BigInteger::valueOf).reduce(::lcm)
     }
-
-    private fun move(nodes: List<Node>, d: Direction) = nodes.map { move(it, d) }
-
-    fun find(startNodes: NodeSelector, endNodes: NodeSelector, directions: List<Direction>): Long {
-        var count = 0L
-        directions.foreverRepeating()
-            .fold(startNodes.nodes()) { currentNodes, dir ->
-                if (currentNodes.all(endNodes)) return@find count
-                else {
-                    count++
-                    if(count.mod(1_000_000_000L) == 0L){
-                        println("${count.div(1_000_000_000)} * 10^9 @ ${System.currentTimeMillis()}")
-                    }
-                    move(currentNodes, dir)
-                }
-            }.let {
-                throw IllegalStateException("result after infinite folding: $it")
-            }
-    }
-
 }
 
 
