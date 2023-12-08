@@ -9,6 +9,8 @@ enum class Direction(val go: (Node) -> String) {
     }
 }
 
+typealias NodeSelector = (Node) -> Boolean
+
 class Network(val nodes: Map<String, Node>) {
     constructor(nodes: List<Node>) : this(nodes.associateBy { it.id })
 
@@ -22,6 +24,7 @@ class Network(val nodes: Map<String, Node>) {
 
     private fun move(n: Node, d: Direction) = n.let(d.go).node()
     private fun String.node() = let(nodes::getValue)
+    private fun NodeSelector.nodes() = nodes.values.filter(this)
 
     fun find(startNodeId: String, endNodeId: String, directions: List<Direction>): Int {
         directions.foreverRepeating().withIndex()
@@ -33,7 +36,31 @@ class Network(val nodes: Map<String, Node>) {
             }
     }
 
+    fun navigate(startNodes: NodeSelector, directions: List<Direction>): List<Node> {
+        return directions.fold(startNodes.nodes(), ::move)
+    }
+
+    private fun move(nodes: List<Node>, d: Direction) = nodes.map { move(it, d) }
+
+    fun find(startNodes: NodeSelector, endNodes: NodeSelector, directions: List<Direction>): Long {
+        var count = 0L
+        directions.foreverRepeating()
+            .fold(startNodes.nodes()) { currentNodes, dir ->
+                if (currentNodes.all(endNodes)) return@find count
+                else {
+                    count++
+                    if(count.mod(1_000_000_000L) == 0L){
+                        println("${count.div(1_000_000_000)} * 10^9 @ ${System.currentTimeMillis()}")
+                    }
+                    move(currentNodes, dir)
+                }
+            }.let {
+                throw IllegalStateException("result after infinite folding: $it")
+            }
+    }
+
 }
+
 
 private fun <E> List<E>.foreverRepeating() = sequence {
     while (true) {
