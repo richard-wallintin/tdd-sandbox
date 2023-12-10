@@ -11,4 +11,12 @@ enum class Direction(val x: Int, val y: Int) {
             W -> E
         }
     }
+    val right: Direction by lazy {
+        when (this) {
+            N -> E
+            E -> S
+            S -> W
+            W -> N
+        }
+    }
 }

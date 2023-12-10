@@ -1,5 +1,6 @@
 package day10
 
+import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
@@ -20,12 +21,12 @@ class PipesTest {
 
     @Test
     fun `parse map`() {
-        Network.parse("L").size shouldBe (1 to 1)
-        Network.parse(".-.").size shouldBe (3 to 1)
-        Network.parse(complexSmallPipe).size shouldBe (5 to 5)
+        Network.parse("L").size shouldBe (Point(1, 1))
+        Network.parse(".-.").size shouldBe (Point(3, 1))
+        Network.parse(complexSmallPipe).size shouldBe (Point(5, 5))
 
         val network = Network.parse(aocInput)
-        network.size shouldBe (140 to 140)
+        network.size shouldBe (Point(140, 140))
 
         println(network.toString())
     }
@@ -33,17 +34,17 @@ class PipesTest {
     @Test
     fun `traverse pipe`() {
         val startNode = Network.parse(simplePipe).startNode
-        startNode.location shouldBe (1 to 1)
+        startNode.location shouldBe (Point(1, 1))
 
-        startNode.traverse().map { it.location }.toList() shouldBe listOf(
-            (1 to 1),
-            (2 to 1),
-            (3 to 1),
-            (3 to 2),
-            (3 to 3),
-            (2 to 3),
-            (1 to 3),
-            (1 to 2)
+        startNode.traverse().map { (n) -> n.location }.toList() shouldBe listOf(
+            (Point(1, 1)),
+            (Point(2, 1)),
+            (Point(3, 1)),
+            (Point(3, 2)),
+            (Point(3, 3)),
+            (Point(2, 3)),
+            (Point(1, 3)),
+            (Point(1, 2))
         )
 
         startNode.traverse().count() shouldBe 8
@@ -53,6 +54,13 @@ class PipesTest {
     fun `part 1`() {
         Network.parse(complexSmallPipe).startNode.traverse().count() / 2 shouldBe 8
         Network.parse(aocInput).startNode.traverse().count() / 2 shouldBe 7102
+    }
+
+    @Test
+    fun `find ground square right to pipe`() {
+        Network.parse(simplePipe).startNode.traverse().mapNotNull { (n, d) ->
+            n.neighbours[d.right]
+        }.first { it.isGround() }.location shouldBe (Point(2, 2))
     }
 
     private val simplePipe = """
