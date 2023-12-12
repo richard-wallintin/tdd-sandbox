@@ -2,7 +2,9 @@ package day10
 
 data class Network(val matrix: List<List<PipeSegment>>) {
     val size: Point = Point(matrix.maxOf { it.size }, matrix.size)
-    val startNode: Node by lazy { findStartNode() }
+    val mainLoopStart: Node by lazy { findStartNode() }
+
+    private val nodes = mutableMapOf<Point, Node>()
 
     private fun findStartNode(): Node {
         matrix.forEachIndexed { y, row ->
@@ -14,8 +16,8 @@ data class Network(val matrix: List<List<PipeSegment>>) {
     }
 
     private fun nodeAt(location: Point): Node? =
-        matrix.getOrNull(location.y)?.getOrNull(location.x)?.let {
-            Node(location, it)
+        matrix.getOrNull(location.y)?.getOrNull(location.x)?.let { p ->
+            nodes.computeIfAbsent(location) { Node(it, p) }
         }
 
     inner class Node(val location: Point, private val pipe: PipeSegment) {
@@ -30,10 +32,10 @@ data class Network(val matrix: List<List<PipeSegment>>) {
 
         private fun connectsTo(direction: Direction) = pipe.connects.contains(direction)
 
-        private fun nodeAt(dir: Direction) = nodeAt(location.go(dir))
+        fun nodeAt(dir: Direction) = nodeAt(location.go(dir))
 
         val neighbours by lazy {
-            Direction.values().mapNotNull { d -> nodeAt(d)?.let { d to it } }.toMap()
+            location.area().mapNotNull { nodeAt(it) }.toList()
         }
 
         private fun next(direction: Direction): Node =
@@ -55,7 +57,26 @@ data class Network(val matrix: List<List<PipeSegment>>) {
             }
         }
 
-        fun isGround() = pipe.isGround()
+        fun overallRotation() =
+            traverse().map { it.second }.zipWithNext { a, b ->
+                a.rotation(b)
+            }.sum()
+
+        fun entireAreaExcept(boundary: Set<Point>): Set<Point> {
+            if (location in boundary) return emptySet()
+
+            val visited = mutableSetOf(location)
+            val queue = neighbours.toMutableList()
+            while (queue.isNotEmpty()) {
+                val c = queue.removeAt(0)
+                if (c.location in boundary) continue
+
+                if (visited.add(c.location)) {
+                    queue.addAll(c.neighbours)
+                }
+            }
+            return visited.toSet()
+        }
     }
 
 
@@ -71,5 +92,31 @@ data class Network(val matrix: List<List<PipeSegment>>) {
 
     override fun toString(): String {
         return matrix.joinToString("\n") { it.joinToString("") }
+    }
+
+    fun mainLoop() = Loop(mainLoopStart)
+
+    inner class Loop(val start: Node, val points: Set<Point>, val rotation: Int) {
+        fun containedArea(): Int {
+            return start.traverse().flatMap { (n, d) ->
+                allNodesLookingInside(n, d) + allNodesLookingAheadInside(n,d)
+            }.toSet().size
+        }
+
+        private fun allNodesLookingInside(n: Node, d: Direction) =
+            (n.nodeAt(inside(d))?.entireAreaExcept(points) ?: emptySet()).asSequence()
+
+        private fun allNodesLookingAheadInside(n: Node, d: Direction) =
+            (n.nodeAt(d)?.nodeAt(inside(d))?.entireAreaExcept(points) ?: emptySet()).asSequence()
+
+        private fun inside(d: Direction) = if (rotation < 0) d.right else d.left
+
+        constructor(start: Node) : this(
+            start,
+            start.traverse().map { it.first.location }.toSet(),
+            start.overallRotation()
+        )
+
+        val size: Int = points.size
     }
 }
