@@ -1,7 +1,6 @@
 package day10
 
 import AOC
-import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
