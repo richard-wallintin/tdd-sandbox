@@ -23,6 +23,8 @@ class UniverseTest {
 
     private val sampleExpanded = sampleUnexpanded.expand()
 
+    private val inputUniverse = Universe.parse(AOC.getInput("/day11.txt"))
+
     @Test
     fun `parse image`() {
         sampleUnexpanded.rows shouldBe 10
@@ -60,10 +62,24 @@ class UniverseTest {
     @Test
     fun `sum of shortest paths`() {
         sampleExpanded.totalShortestPaths() shouldBe 374
+        sampleUnexpanded.expand(factor = 10).totalShortestPaths() shouldBe 1030
+        sampleUnexpanded.expand(factor = 100).totalShortestPaths() shouldBe 8410
     }
 
     @Test
+    fun `factored expansion`() {
+        val exp = sampleUnexpanded.expand(factor = 10)
+        exp.locationOfGalaxy(1) shouldBe Coord(0, 12)
+    }
+
+
+    @Test
     fun `part 1`() {
-        Universe.parse(AOC.getInput("/day11.txt")).expand().totalShortestPaths() shouldBe 10_154_062
+        inputUniverse.expand().totalShortestPaths() shouldBe 10_154_062
+    }
+
+    @Test
+    fun `part 2`() {
+        inputUniverse.expand(factor = 1_000_000).totalShortestPaths() shouldBe 553_083_047_914L
     }
 }
