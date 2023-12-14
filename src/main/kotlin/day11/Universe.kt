@@ -3,8 +3,8 @@ package day11
 import kotlin.math.abs
 
 data class Universe(
-    val rows: Int,
-    val columns: Int,
+    val rows: Long,
+    val columns: Long,
     val galaxyCoordinates: List<Coord>,
 ) {
     val galaxies = galaxyCoordinates.size
@@ -12,7 +12,7 @@ data class Universe(
         return galaxyCoordinates[no - 1]
     }
 
-    fun shortestPath(noA: Int, noB: Int): Int {
+    fun shortestPath(noA: Int, noB: Int): Long {
         val a = locationOfGalaxy(noA)
         val b = locationOfGalaxy(noB)
         return distance(b, a)
@@ -20,28 +20,24 @@ data class Universe(
 
     private fun distance(b: Coord, a: Coord) = abs(b.row - a.row) + abs(b.col - a.col)
 
-    fun expand(): Universe {
+    fun expand(factor: Long = 2): Universe {
+        val expansionFactor = factor - 1
         return Universe(
-            rows = rows + emptyRows,
-            columns = columns + emptyColumns,
+            rows = rows + (emptyRows * expansionFactor),
+            columns = columns + (emptyColumns * expansionFactor),
             galaxyCoordinates = galaxyCoordinates.map { original ->
                 Coord(
-                    row = expandRow(original.row),
-                    col = expandCol(original.col)
+                    row = original.row + (expansionRows(original.row) * expansionFactor),
+                    col = original.col + (expansionColumns(original.col) * expansionFactor)
                 )
             }
         )
     }
 
-    private fun expandCol(col: Int): Int {
-        return emptyColumnNumbers.count { it <= col } + col
-    }
+    private fun expansionColumns(col: Long) = emptyColumnNumbers.count { it <= col }.toLong()
+    private fun expansionRows(row: Long) = emptyRowNumbers.count { it <= row }.toLong()
 
-    private fun expandRow(row: Int): Int {
-        return emptyRowNumbers.count { it <= row } + row
-    }
-
-    fun totalShortestPaths(): Int {
+    fun totalShortestPaths(): Long {
         return galaxyCoordinates.mapIndexed { i, c ->
             galaxyCoordinates.drop(i + 1).sumOf { distance(c, it) }
         }.sum()
@@ -64,8 +60,8 @@ data class Universe(
 
     companion object {
         fun parse(text: String): Universe {
-            var rows = 0
-            var cols = 0
+            var rows = 0L
+            var cols = 0L
             val galaxyCoordinates = mutableListOf<Coord>()
             text.lineSequence().forEach { line ->
                 cols = 0
