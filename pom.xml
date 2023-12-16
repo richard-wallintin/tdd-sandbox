@@ -18,7 +18,7 @@
     <kotlin.compiler.jvmTarget>${java.level}</kotlin.compiler.jvmTarget>
     <maven.compiler.source>${java.level}</maven.compiler.source>
     <maven.compiler.target>${java.level}</maven.compiler.target>
-    <kotlin.version>1.8.10</kotlin.version>
+    <kotlin.version>1.9.21</kotlin.version>
     <junit.version>5.9.2</junit.version>
     <lombok.version>1.18.26</lombok.version>
     <cucumber-java.version>7.11.1</cucumber-java.version>
@@ -104,6 +104,16 @@
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-stdlib-jdk8</artifactId>
       <version>${kotlin.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains.kotlinx</groupId>
+      <artifactId>kotlinx-coroutines-core-jvm</artifactId>
+      <version>1.7.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains.kotlinx</groupId>
+      <artifactId>kotlinx-coroutines-core</artifactId>
+      <version>1.7.3</version>
     </dependency>
     <dependency>
       <groupId>com.natpryce</groupId>
