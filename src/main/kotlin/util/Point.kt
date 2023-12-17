@@ -1,4 +1,4 @@
-package day10
+package util
 
 data class Point(val x: Int, val y: Int) {
     fun go(dir: Direction) = Point(x + dir.x, y + dir.y)

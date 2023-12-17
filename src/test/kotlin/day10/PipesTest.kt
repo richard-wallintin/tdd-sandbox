@@ -3,6 +3,8 @@ package day10
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import util.Direction
+import util.Point
 
 class PipesTest {
     @Test
