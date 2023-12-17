@@ -34,7 +34,6 @@ data class PipeSegment(val connects: Set<Direction>) {
     }
 
     fun isStart() = connects == start
-    fun isGround() = connects == ground
 }
 
 val vertical = setOf(Direction.N, Direction.S)
