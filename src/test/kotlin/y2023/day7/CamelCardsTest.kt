@@ -1,16 +1,12 @@
 package y2023.day7
 
 import AOC
-import y2023.day7.Bet.Companion.totalWinnings
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import util.split
-import y2023.day7.Bet
-import y2023.day7.Hand
-import y2023.day7.Label
-import y2023.day7.Type
+import y2023.day7.Bet.Companion.totalWinnings
 
 class CamelCardsTest {
 

@@ -5,7 +5,6 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import util.Direction
 import util.Point
-import y2023.day10.*
 
 class PipesTest {
     @Test

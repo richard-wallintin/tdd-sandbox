@@ -1,10 +1,9 @@
 package y2023.day4
 
-import y2023.day4.ScratchCard.Companion.pileWorth
+import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import y2023.day4.Pile
-import y2023.day4.ScratchCard
+import y2023.day4.ScratchCard.Companion.pileWorth
 
 class ScratchCardTest {
 

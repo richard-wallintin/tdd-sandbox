@@ -1,6 +1,5 @@
 package y2023.day5
 
-import util.integers
 import util.longs
 
 data class Mapping(val types: Pair<String, String>, val ranges: List<MappingRange> = listOf()) {

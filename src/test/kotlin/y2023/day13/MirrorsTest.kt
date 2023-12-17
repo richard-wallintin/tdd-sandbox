@@ -1,10 +1,9 @@
 package y2023.day13
 
 import AOC
-import y2023.day13.Pattern.Companion.diff
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import y2023.day13.Pattern
+import y2023.day13.Pattern.Companion.diff
 
 class MirrorsTest {
 

@@ -1,10 +1,10 @@
 package y2023.day3
 
 import AOC
-import y2023.day3.Gear.Companion.asGear
-import y2023.day3.Location.Companion.by
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import y2023.day3.Gear.Companion.asGear
+import y2023.day3.Location.Companion.by
 
 class EnginePartsTest {
 
