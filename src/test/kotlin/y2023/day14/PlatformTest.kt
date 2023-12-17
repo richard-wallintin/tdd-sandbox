@@ -33,6 +33,32 @@ class PlatformTest {
         #OO..#....
     """.trimIndent()
 
+    private val referencePlatformAfterOneCycle = """
+        .....#....
+        ....#...O#
+        ...OO##...
+        .OO#......
+        .....OOO#.
+        .O#...O#.#
+        ....O#....
+        ......OOOO
+        #...O###..
+        #..OO#....
+    """.trimIndent()
+
+    private val referencePlatformAfterThreeCycles = """
+        .....#....
+        ....#...O#
+        .....##...
+        ..O#......
+        .....OOO#.
+        .O#...O#.#
+        ....O#...O
+        .......OOO
+        #...O###.O
+        #.OOO#...O
+    """.trimIndent()
+
     @Test
     fun `lane load calculation`() {
         Lane.of("...O...").load shouldBe 4
@@ -63,11 +89,60 @@ class PlatformTest {
     }
 
 
+    private val inputPlatform = Platform.of(AOC.getInput("/2023/day14.txt"))
+
     @Test
     fun `part 1`() {
-        Platform.of(AOC.getInput("/2023/day14.txt"))
+        inputPlatform
             .tilt(Direction.N)
-            .load(Direction.N) shouldBe 42
+            .load(Direction.N) shouldBe 109665
+    }
+
+    @Test
+    fun `free turning`() {
+        Platform.of("AB\nCD").turn(Direction.N) shouldBe
+                Platform.of("BD\nAC", Direction.N)
+
+        Platform.of("AB\nCD").turn(Direction.S) shouldBe
+                Platform.of("CA\nDB", Direction.S)
+
+        Platform.of("AB\nCD").turn(Direction.E) shouldBe
+                Platform.of("DC\nBA", Direction.E)
+
+        Platform.of("AB\nCD").turn(Direction.W) shouldBe
+                Platform.of("AB\nCD", Direction.W)
+
+        Platform.of("AB\nCD").turn(Direction.N).turn(Direction.W) shouldBe
+                Platform.of("AB\nCD", Direction.W)
+
+        Platform.of("AB\nCD").turn(Direction.S).turn(Direction.W) shouldBe
+                Platform.of("AB\nCD", Direction.W)
+
+        Platform.of("AB\nCD")
+            .turn(Direction.N)
+            .turn(Direction.W)
+            .turn(Direction.S)
+            .turn(Direction.E)
+            .turn(Direction.W) shouldBe
+                Platform.of("AB\nCD", Direction.W)
+    }
+
+    @Test
+    fun tiltCycle() {
+        Platform.of(referencePlatform).tiltCycle() shouldBe Platform.of(
+            referencePlatformAfterOneCycle
+        )
+
+        Platform.of(referencePlatform).tiltCycle(3) shouldBe Platform.of(
+            referencePlatformAfterThreeCycles
+        )
+
+        Platform.of(referencePlatform).tiltCycle(1_000_000_000).load(Direction.N) shouldBe 64
+    }
+
+    @Test
+    fun `part 2`() {
+        inputPlatform.tiltCycle(1_000_000_000).load(Direction.N) shouldBe 96061
     }
 }
 
