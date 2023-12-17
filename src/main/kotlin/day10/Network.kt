@@ -1,5 +1,8 @@
 package day10
 
+import util.Direction
+import util.Point
+
 data class Network(val matrix: List<List<PipeSegment>>) {
     val size: Point = Point(matrix.maxOf { it.size }, matrix.size)
     val mainLoopStart: Node by lazy { findStartNode() }

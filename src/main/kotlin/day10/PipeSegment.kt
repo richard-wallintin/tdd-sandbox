@@ -1,5 +1,7 @@
 package day10
 
+import util.Direction
+
 data class PipeSegment(val connects: Set<Direction>) {
     companion object {
         fun of(s: String): PipeSegment {
