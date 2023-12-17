@@ -1,13 +1,9 @@
 package y2023.day8
 
 import AOC
-import y2023.day8.Direction.Companion.navigationInstructions
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import y2023.day8.Direction
-import y2023.day8.Network
-import y2023.day8.Node
-import y2023.day8.NodeSelector
+import y2023.day8.Direction.Companion.navigationInstructions
 import java.math.BigInteger
 
 class DesertTest {

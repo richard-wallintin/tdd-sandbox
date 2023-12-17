@@ -1,11 +1,11 @@
 package y2023.day2
 
 import AOC
+import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Test
 import y2023.day2.Cubes.Companion.blue
 import y2023.day2.Cubes.Companion.green
 import y2023.day2.Cubes.Companion.red
-import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Test
 import kotlin.math.max
 
 

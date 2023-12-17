@@ -5,6 +5,6 @@ enum class Label(val c: Char) {
     T('T'), J('J'), Q('Q'), K('K'), A('A');
 
     companion object {
-        fun of(c: Char) = Label.values().first { it.c == c }
+        fun of(c: Char) = entries.first { it.c == c }
     }
 }

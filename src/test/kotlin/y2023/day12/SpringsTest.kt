@@ -1,13 +1,9 @@
 package y2023.day12
 
 import AOC
-import y2023.day12.ConditionRecord.Companion.totalResolutions
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import y2023.day12.ConditionRecord
-import y2023.day12.DamagedGroups
-import y2023.day12.SpringRow
-import y2023.day12.SpringState
+import y2023.day12.ConditionRecord.Companion.totalResolutions
 
 class SpringsTest {
 

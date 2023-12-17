@@ -1,15 +1,12 @@
 package y2023.day5
 
 import AOC
-import y2023.day5.Almanac.Companion.seedRanges
-import y2023.day5.Almanac.Companion.seeds
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import y2023.day5.Almanac
-import y2023.day5.Mapping
-import y2023.day5.MappingRange
+import y2023.day5.Almanac.Companion.seedRanges
+import y2023.day5.Almanac.Companion.seeds
 
 class GardenTest {
 

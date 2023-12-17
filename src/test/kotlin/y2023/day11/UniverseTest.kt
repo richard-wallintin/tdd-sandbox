@@ -3,8 +3,6 @@ package y2023.day11
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import y2023.day11.Coord
-import y2023.day11.Universe
 
 class UniverseTest {
 
