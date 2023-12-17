@@ -29,9 +29,15 @@ data class Lane(val elements: String) {
 
         fun List<Lane>.transpose(): List<Lane> = (0 until first().size)
             .map { c -> map { it[c] }.toCharArray().concatToString().let(::Lane) }
+
+        fun List<Lane>.invert(): List<Lane> = map { it.invert() }
     }
 
+    fun invert() = Lane(elements.reversed())
+
     private operator fun get(i: Int) = elements[i]
+
+    override fun toString() = elements
 }
 
 private fun Char.repeat(n: Int) = toString().repeat(n)
