@@ -37,14 +37,22 @@ data class Contraption(val lines: List<String>) {
     }
 
     private fun traverse(beam: Beam, tile: Tile, seen: MutableSet<Beam>) {
-        beam.encounter(tile).map { it.next() }
-            .forEach { nextBeam ->
-                tile(nextBeam.location)?.let { t ->
-                    if (seen.add(nextBeam)) {
-                        traverse(nextBeam, t, seen)
-                    }
+        beam.encounter(tile).map { it.next() }.forEach { n ->
+            tile(n.location)?.let { t ->
+                if (seen.add(n)) {
+                    traverse(n, t, seen)
                 }
             }
+        }
+    }
+
+    fun maxIllumination(): Int {
+        val top = (0 until size.x).map { Point(it, 0) }.map { Beam(it, Direction.S) }
+        val bottom = (0 until size.x).map { Point(it, size.y - 1) }.map { Beam(it, Direction.N) }
+        val left = (0 until size.y).map { Point(0, it) }.map { Beam(it, Direction.E) }
+        val right = (0 until size.y).map { Point(size.x - 1, it) }.map { Beam(it, Direction.W) }
+
+        return (top + right + bottom + left).asSequence().map { illumination(it) }.max()
     }
 
 
