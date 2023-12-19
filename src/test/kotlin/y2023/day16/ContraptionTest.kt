@@ -82,8 +82,20 @@ class ContraptionTest {
         reference.illumination() shouldBe 46
     }
 
+    private val input = Contraption.parse(AOC.getInput("/2023/day16.txt"))
+
     @Test
     fun `part 1`() {
-        Contraption.parse(AOC.getInput("/2023/day16.txt")).illumination() shouldBe 7996
+        input.illumination() shouldBe 7996
+    }
+
+    @Test
+    fun `max energy`() {
+        reference.maxIllumination() shouldBe 51
+    }
+
+    @Test
+    fun `part 2`() {
+        input.maxIllumination() shouldBe 8239
     }
 }
