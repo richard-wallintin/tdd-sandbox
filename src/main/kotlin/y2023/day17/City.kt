@@ -18,28 +18,14 @@ class City(val matrix: List<List<Int>>) {
         start: Point,
         dest: Point
     ): Int {
-        val cache = mutableMapOf<Trajectory, Path>()
-
         val init = Trajectory(from = start, CardinalDirection.E, 0)
 
-        val guide =
-            findShortestPath(init, dest, cache, 9).take(100).minBy { it.totalLoss }
-
-        println("${guide.summary} - ${guide.totalLoss}")
-
-        guide.traverseBackwards().forEach {
-            val strictylBest = findShortestPath(it.trajectory, dest, cache, 1).first()
-            println(strictylBest)
-            cache[it.trajectory] = strictylBest
-        }
-
-        return cache[init]?.totalLoss ?: Int.MAX_VALUE
+        return findShortestPath(init, dest, 1).first().totalLoss
     }
 
     private fun findShortestPath(
         start: Trajectory,
         dest: Point,
-        cache: MutableMap<Trajectory, Path>,
         costEstimate: Int
     ) = sequence {
 
@@ -50,10 +36,6 @@ class City(val matrix: List<List<Int>>) {
             val p = queue.remove()
             // println(p.summary)
             if (p.to == dest) yield(p)
-
-            cache[p.trajectory]?.let {
-                yield(p + it)
-            }
 
             queue.addAll(p.next { lossAt(it.x, it.y) })
         }

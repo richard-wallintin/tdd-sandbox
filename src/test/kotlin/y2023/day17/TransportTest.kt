@@ -34,7 +34,7 @@ class TransportTest {
     fun `path traveled`() {
         start.walk(AHEAD) { 3 } shouldBe Path(
             to = Point(1, 0), direction = E,
-            from = start, loss = 3
+            from = start, loss = 3, straight = 1
         )
 
         start.walk(AHEAD) { null } shouldBe null
@@ -42,33 +42,19 @@ class TransportTest {
         val right = start.walk(RIGHT) { 1 }!!
         right shouldBe Path(
             to = Point(0, 1), direction = S,
-            from = start, loss = 1
+            from = start, loss = 1, straight = 1
         )
 
         val rightLeft = right.walk(LEFT) { 7 }!!
 
         rightLeft shouldBe Path(
             to = Point(1, 1), direction = E,
-            from = right, loss = 7
+            from = right, loss = 7, straight = 1
         )
         rightLeft.totalLoss shouldBe 8
 
         rightLeft.straight shouldBe 1
         rightLeft.walk(AHEAD) { 1 }?.straight shouldBe 2
-    }
-
-    @Test
-    fun `concat paths`() {
-        val a = Path(to = Point(1, 1))
-
-        val aToB = a.walk(AHEAD) { 33 }!!
-        val bToC = Path(to = Point(2, 1)).walk(AHEAD) { 22 }!!
-
-        val aToC = aToB + bToC
-
-        aToC.totalLoss shouldBe 55
-        aToC.start shouldBe a
-        aToC.straight shouldBe 2
     }
 
     @Test
@@ -102,7 +88,7 @@ class TransportTest {
     }
 
     @Test
-    fun `hottest path`() {
+    fun `shortest path`() {
         referenceCity.findShortestPath(
             start = Point(0, 0),
             dest = Point(12, 12)
