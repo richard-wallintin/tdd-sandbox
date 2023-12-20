@@ -15,32 +15,32 @@ class City(val matrix: List<List<Int>>) {
     }
 
     fun findShortestPath(
+        start: Point = Point(0, 0),
+        dest: Point = Point(matrix.size - 1, matrix.first().size - 1),
+        policy: Policy = Policy(0, 3),
+    ) = findShortestPaths(start, dest, policy).first().totalLoss
+
+    private fun findShortestPaths(
         start: Point,
-        dest: Point
-    ): Int {
-        val init = Trajectory(from = start, CardinalDirection.E, 0)
-
-        return findShortestPath(init, dest, 1).first().totalLoss
-    }
-
-    private fun findShortestPath(
-        start: Trajectory,
         dest: Point,
-        costEstimate: Int
+        policy: Policy,
+        costEstimate: Int = 1,
+        seen: MutableSet<Trajectory> = mutableSetOf()
     ) = sequence {
-
         val queue = PriorityQueue<Path>(compareBy { it.heuristicLoss(dest, costEstimate) })
-        queue.add(Path(start))
+        queue.addAll(
+            listOf(CardinalDirection.E, CardinalDirection.S).map {
+                Path(start, it, policy = policy)
+            })
 
         while (queue.isNotEmpty()) {
             val p = queue.remove()
-            // println(p.summary)
-            if (p.to == dest) yield(p)
-
-            queue.addAll(p.next { lossAt(it.x, it.y) })
+            if (p.to == dest && p.canStop) yield(p)
+            else queue.addAll(
+                p.next { lossAt(it.x, it.y) }.filter { seen.add(it.trajectory) }
+            )
         }
     }
-
 
     companion object {
         fun of(text: String): City {
@@ -50,5 +50,4 @@ class City(val matrix: List<List<Int>>) {
             )
         }
     }
-
 }

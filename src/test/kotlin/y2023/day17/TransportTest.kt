@@ -2,7 +2,6 @@ package y2023.day17
 
 import AOC
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import util.CardinalDirection.*
 import util.Point
@@ -28,13 +27,25 @@ class TransportTest {
         """.trimIndent()
     )
 
+    private val reference2 = City.of(
+        """
+            111111111111
+            999999999991
+            999999999991
+            999999999991
+            999999999991
+        """.trimIndent()
+    )
+
+    private val inputCity = City.of(AOC.getInput("/2023/day17.txt"))
+
     private val start = Path(to = Point(0, 0), direction = E)
 
     @Test
     fun `path traveled`() {
         start.walk(AHEAD) { 3 } shouldBe Path(
             to = Point(1, 0), direction = E,
-            from = start, loss = 3, straight = 1
+            totalLoss = 3, straight = 1
         )
 
         start.walk(AHEAD) { null } shouldBe null
@@ -42,16 +53,15 @@ class TransportTest {
         val right = start.walk(RIGHT) { 1 }!!
         right shouldBe Path(
             to = Point(0, 1), direction = S,
-            from = start, loss = 1, straight = 1
+            totalLoss = 1, straight = 1
         )
 
         val rightLeft = right.walk(LEFT) { 7 }!!
 
         rightLeft shouldBe Path(
             to = Point(1, 1), direction = E,
-            from = right, loss = 7, straight = 1
+            totalLoss = 8, straight = 1
         )
-        rightLeft.totalLoss shouldBe 8
 
         rightLeft.straight shouldBe 1
         rightLeft.walk(AHEAD) { 1 }?.straight shouldBe 2
@@ -83,24 +93,44 @@ class TransportTest {
     }
 
     @Test
+    fun `traversal policy`() {
+        val start = Path(to = Point(0, 0), direction = E, policy = Policy(4, 10))
+
+        start.next { 3 }.toList().map { it.direction } shouldBe listOf(E)
+
+        (1..5).fold(sequenceOf(start)) { p, c -> p.flatMap { it.next { c } } }
+            .toList().map { it.direction } shouldBe listOf(E, N, S)
+    }
+
+    @Test
     fun `average heat loss in the city`() {
         referenceCity.averageLoss shouldBe 5
     }
 
     @Test
     fun `shortest path`() {
-        referenceCity.findShortestPath(
-            start = Point(0, 0),
-            dest = Point(12, 12)
-        ) shouldBe 102
+        referenceCity.findShortestPath() shouldBe 102
+    }
+
+
+    @Test
+    fun `part 1`() {
+        inputCity.findShortestPath() shouldBe 1039
     }
 
     @Test
-    @Disabled
-    fun `part 1`() {
-        City.of(AOC.getInput("/2023/day17.txt")).findShortestPath(
-            start = Point(0, 0),
-            dest = Point(140, 140)
-        ) shouldBe 42
+    fun `shortest path with policy`() {
+        referenceCity.findShortestPath(
+            policy = Policy(4, 10)
+        ) shouldBe 94
+
+        reference2.findShortestPath(
+            policy = Policy(4, 10)
+        ) shouldBe 71
+    }
+
+    @Test
+    fun `part 2`() {
+        inputCity.findShortestPath(policy = Policy(4, 10)) shouldBe 1201
     }
 }
