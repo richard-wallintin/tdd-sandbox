@@ -36,6 +36,9 @@ data class Path(
     fun walk(r: RelativeDirection, lossFunction: LossFunction): Path? {
         val dir = direction.turn(r)
         val next = to.go(dir)
+
+        if (beenThere(next)) return null
+
         return lossFunction(next)?.let { loss ->
             copy(
                 to = next,
@@ -47,32 +50,24 @@ data class Path(
         }
     }
 
+    private fun beenThere(point: Point): Boolean {
+        return if (to == point) true
+        else from?.beenThere(point) ?: false
+    }
+
     fun next(lossFunction: LossFunction) = sequence {
         if (straight < 3) yield(RelativeDirection.AHEAD)
         yield(RelativeDirection.LEFT)
         yield(RelativeDirection.RIGHT)
     }.mapNotNull { walk(it, lossFunction) }
 
-    operator fun plus(standalone: Path): Path {
-        return standalone.prepend(this)
-    }
-
-    private fun prepend(newRoot: Path): Path {
-        return if (from == null) {
-            assert(newRoot.to == this.to)
-            newRoot
-        } else copy(from = from.prepend(newRoot))
-    }
-
-    val summary: String by lazy { (from?.summary ?: "$to") + direction }
+    private val summary: String by lazy { (from?.summary ?: "$to") + direction }
 
     override fun toString(): String {
         return "$summary -> $to [$totalLoss]"
     }
 
     val trajectory by lazy { Trajectory(to, direction, straight) }
-
-    val start: Path by lazy { from?.start ?: this }
 
     fun traverseBackwards(): Sequence<Path> =
         sequenceOf(this) + (from?.traverseBackwards() ?: emptySequence())
