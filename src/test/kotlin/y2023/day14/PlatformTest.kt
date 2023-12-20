@@ -3,7 +3,7 @@ package y2023.day14
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import util.Direction
+import util.CardinalDirection
 
 class PlatformTest {
 
@@ -67,7 +67,7 @@ class PlatformTest {
 
     @Test
     fun `platform to lanes`() {
-        Platform.of(referencePlatformTiltedNorth).load(Direction.N)
+        Platform.of(referencePlatformTiltedNorth).load(CardinalDirection.N)
     }
 
     @Test
@@ -84,7 +84,7 @@ class PlatformTest {
 
     @Test
     fun `platform tilting`() {
-        Platform.of(referencePlatform).tilt(Direction.N) shouldBe
+        Platform.of(referencePlatform).tilt(CardinalDirection.N) shouldBe
                 Platform.of(referencePlatformTiltedNorth)
     }
 
@@ -94,37 +94,37 @@ class PlatformTest {
     @Test
     fun `part 1`() {
         inputPlatform
-            .tilt(Direction.N)
-            .load(Direction.N) shouldBe 109665
+            .tilt(CardinalDirection.N)
+            .load(CardinalDirection.N) shouldBe 109665
     }
 
     @Test
     fun `free turning`() {
-        Platform.of("AB\nCD").turn(Direction.N) shouldBe
-                Platform.of("BD\nAC", Direction.N)
+        Platform.of("AB\nCD").turn(CardinalDirection.N) shouldBe
+                Platform.of("BD\nAC", CardinalDirection.N)
 
-        Platform.of("AB\nCD").turn(Direction.S) shouldBe
-                Platform.of("CA\nDB", Direction.S)
+        Platform.of("AB\nCD").turn(CardinalDirection.S) shouldBe
+                Platform.of("CA\nDB", CardinalDirection.S)
 
-        Platform.of("AB\nCD").turn(Direction.E) shouldBe
-                Platform.of("DC\nBA", Direction.E)
+        Platform.of("AB\nCD").turn(CardinalDirection.E) shouldBe
+                Platform.of("DC\nBA", CardinalDirection.E)
 
-        Platform.of("AB\nCD").turn(Direction.W) shouldBe
-                Platform.of("AB\nCD", Direction.W)
+        Platform.of("AB\nCD").turn(CardinalDirection.W) shouldBe
+                Platform.of("AB\nCD", CardinalDirection.W)
 
-        Platform.of("AB\nCD").turn(Direction.N).turn(Direction.W) shouldBe
-                Platform.of("AB\nCD", Direction.W)
+        Platform.of("AB\nCD").turn(CardinalDirection.N).turn(CardinalDirection.W) shouldBe
+                Platform.of("AB\nCD", CardinalDirection.W)
 
-        Platform.of("AB\nCD").turn(Direction.S).turn(Direction.W) shouldBe
-                Platform.of("AB\nCD", Direction.W)
+        Platform.of("AB\nCD").turn(CardinalDirection.S).turn(CardinalDirection.W) shouldBe
+                Platform.of("AB\nCD", CardinalDirection.W)
 
         Platform.of("AB\nCD")
-            .turn(Direction.N)
-            .turn(Direction.W)
-            .turn(Direction.S)
-            .turn(Direction.E)
-            .turn(Direction.W) shouldBe
-                Platform.of("AB\nCD", Direction.W)
+            .turn(CardinalDirection.N)
+            .turn(CardinalDirection.W)
+            .turn(CardinalDirection.S)
+            .turn(CardinalDirection.E)
+            .turn(CardinalDirection.W) shouldBe
+                Platform.of("AB\nCD", CardinalDirection.W)
     }
 
     @Test
@@ -137,12 +137,12 @@ class PlatformTest {
             referencePlatformAfterThreeCycles
         )
 
-        Platform.of(referencePlatform).tiltCycle(1_000_000_000).load(Direction.N) shouldBe 64
+        Platform.of(referencePlatform).tiltCycle(1_000_000_000).load(CardinalDirection.N) shouldBe 64
     }
 
     @Test
     fun `part 2`() {
-        inputPlatform.tiltCycle(1_000_000_000).load(Direction.N) shouldBe 96061
+        inputPlatform.tiltCycle(1_000_000_000).load(CardinalDirection.N) shouldBe 96061
     }
 }
 
