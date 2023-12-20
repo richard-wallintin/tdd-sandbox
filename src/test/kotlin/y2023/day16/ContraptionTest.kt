@@ -3,7 +3,7 @@ package y2023.day16
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import util.Direction
+import util.CardinalDirection
 import util.Point
 import y2023.day16.Beam.Companion.uniqueLocations
 
@@ -32,48 +32,48 @@ class ContraptionTest {
 
     @Test
     fun encounters() {
-        Tile('.').divert(Direction.N) shouldBe listOf(Direction.N)
-        Tile('.').divert(Direction.W) shouldBe listOf(Direction.W)
+        Tile('.').divert(CardinalDirection.N) shouldBe listOf(CardinalDirection.N)
+        Tile('.').divert(CardinalDirection.W) shouldBe listOf(CardinalDirection.W)
 
-        Tile('|').divert(Direction.W) shouldBe listOf(Direction.N, Direction.S)
-        Tile('|').divert(Direction.E) shouldBe listOf(Direction.N, Direction.S)
-        Tile('|').divert(Direction.N) shouldBe listOf(Direction.N)
-        Tile('|').divert(Direction.S) shouldBe listOf(Direction.S)
+        Tile('|').divert(CardinalDirection.W) shouldBe listOf(CardinalDirection.N, CardinalDirection.S)
+        Tile('|').divert(CardinalDirection.E) shouldBe listOf(CardinalDirection.N, CardinalDirection.S)
+        Tile('|').divert(CardinalDirection.N) shouldBe listOf(CardinalDirection.N)
+        Tile('|').divert(CardinalDirection.S) shouldBe listOf(CardinalDirection.S)
 
-        Tile('-').divert(Direction.W) shouldBe listOf(Direction.W)
-        Tile('-').divert(Direction.E) shouldBe listOf(Direction.E)
-        Tile('-').divert(Direction.N) shouldBe listOf(Direction.W, Direction.E)
-        Tile('-').divert(Direction.S) shouldBe listOf(Direction.W, Direction.E)
+        Tile('-').divert(CardinalDirection.W) shouldBe listOf(CardinalDirection.W)
+        Tile('-').divert(CardinalDirection.E) shouldBe listOf(CardinalDirection.E)
+        Tile('-').divert(CardinalDirection.N) shouldBe listOf(CardinalDirection.W, CardinalDirection.E)
+        Tile('-').divert(CardinalDirection.S) shouldBe listOf(CardinalDirection.W, CardinalDirection.E)
 
-        Tile('/').divert(Direction.W) shouldBe listOf(Direction.S)
-        Tile('/').divert(Direction.E) shouldBe listOf(Direction.N)
-        Tile('/').divert(Direction.N) shouldBe listOf(Direction.E)
-        Tile('/').divert(Direction.S) shouldBe listOf(Direction.W)
+        Tile('/').divert(CardinalDirection.W) shouldBe listOf(CardinalDirection.S)
+        Tile('/').divert(CardinalDirection.E) shouldBe listOf(CardinalDirection.N)
+        Tile('/').divert(CardinalDirection.N) shouldBe listOf(CardinalDirection.E)
+        Tile('/').divert(CardinalDirection.S) shouldBe listOf(CardinalDirection.W)
 
-        Tile('\\').divert(Direction.W) shouldBe listOf(Direction.N)
-        Tile('\\').divert(Direction.E) shouldBe listOf(Direction.S)
-        Tile('\\').divert(Direction.N) shouldBe listOf(Direction.W)
-        Tile('\\').divert(Direction.S) shouldBe listOf(Direction.E)
+        Tile('\\').divert(CardinalDirection.W) shouldBe listOf(CardinalDirection.N)
+        Tile('\\').divert(CardinalDirection.E) shouldBe listOf(CardinalDirection.S)
+        Tile('\\').divert(CardinalDirection.N) shouldBe listOf(CardinalDirection.W)
+        Tile('\\').divert(CardinalDirection.S) shouldBe listOf(CardinalDirection.E)
     }
 
     @Test
     fun `beam diversion`() {
-        Beam(location = Point(1, 0), direction = Direction.E).encounter(Tile('|')) shouldBe
+        Beam(location = Point(1, 0), direction = CardinalDirection.E).encounter(Tile('|')) shouldBe
                 listOf(
-                    Beam(location = Point(1, 0), direction = Direction.N),
-                    Beam(location = Point(1, 0), direction = Direction.S)
+                    Beam(location = Point(1, 0), direction = CardinalDirection.N),
+                    Beam(location = Point(1, 0), direction = CardinalDirection.S)
                 )
     }
 
     @Test
     fun `beam travels`() {
-        val trace = reference.trace(Beam(location = Point(0, 0), direction = Direction.E))
+        val trace = reference.trace(Beam(location = Point(0, 0), direction = CardinalDirection.E))
 
         trace.take(4).toList() shouldBe listOf(
-            Beam(location = Point(0, 0), direction = Direction.E),
-            Beam(location = Point(1, 0), direction = Direction.E),
-            Beam(location = Point(1, 1), direction = Direction.S),
-            Beam(location = Point(1, 2), direction = Direction.S)
+            Beam(location = Point(0, 0), direction = CardinalDirection.E),
+            Beam(location = Point(1, 0), direction = CardinalDirection.E),
+            Beam(location = Point(1, 1), direction = CardinalDirection.S),
+            Beam(location = Point(1, 2), direction = CardinalDirection.S)
         )
 
         trace.count() shouldBe 51

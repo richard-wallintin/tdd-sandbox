@@ -3,7 +3,7 @@ package y2023.day10
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import util.Direction
+import util.CardinalDirection
 import util.Point
 
 class PipesTest {
@@ -59,10 +59,10 @@ class PipesTest {
 
     @Test
     fun rotation() {
-        Direction.N.rotation(Direction.E) shouldBe -1
-        Direction.N.rotation(Direction.W) shouldBe 1
-        Direction.N.rotation(Direction.N) shouldBe 0
-        Direction.N.rotation(Direction.S) shouldBe 0
+        CardinalDirection.N.rotation(CardinalDirection.E) shouldBe -1
+        CardinalDirection.N.rotation(CardinalDirection.W) shouldBe 1
+        CardinalDirection.N.rotation(CardinalDirection.N) shouldBe 0
+        CardinalDirection.N.rotation(CardinalDirection.S) shouldBe 0
     }
 
     @Test

@@ -1,6 +1,6 @@
 package y2023.day10
 
-import util.Direction
+import util.CardinalDirection
 import util.Point
 
 data class Network(val matrix: List<List<PipeSegment>>) {
@@ -33,23 +33,23 @@ data class Network(val matrix: List<List<PipeSegment>>) {
             }
         }
 
-        private fun connectsTo(direction: Direction) = pipe.connects.contains(direction)
+        private fun connectsTo(direction: CardinalDirection) = pipe.connects.contains(direction)
 
-        fun nodeAt(dir: Direction) = nodeAt(location.go(dir))
+        fun nodeAt(dir: CardinalDirection) = nodeAt(location.go(dir))
 
         val neighbours by lazy {
             location.area().mapNotNull { nodeAt(it) }.toList()
         }
 
-        private fun next(direction: Direction): Node =
+        private fun next(direction: CardinalDirection): Node =
             connect[direction] ?: throw IllegalArgumentException(
                 "cant go $direction from $location ($pipe)"
             )
 
-        private fun nextDirectionComingFrom(direction: Direction) =
+        private fun nextDirectionComingFrom(direction: CardinalDirection) =
             connect.keys.first { it != direction }
 
-        fun traverse(direction: Direction = connect.keys.min()) = sequence {
+        fun traverse(direction: CardinalDirection = connect.keys.min()) = sequence {
             var d = direction
             yield(this@Node to d)
             var n = next(d)
@@ -106,13 +106,13 @@ data class Network(val matrix: List<List<PipeSegment>>) {
             }.toSet().size
         }
 
-        private fun allNodesLookingInside(n: Node, d: Direction) =
+        private fun allNodesLookingInside(n: Node, d: CardinalDirection) =
             (n.nodeAt(inside(d))?.entireAreaExcept(points) ?: emptySet()).asSequence()
 
-        private fun allNodesLookingAheadInside(n: Node, d: Direction) =
+        private fun allNodesLookingAheadInside(n: Node, d: CardinalDirection) =
             (n.nodeAt(d)?.nodeAt(inside(d))?.entireAreaExcept(points) ?: emptySet()).asSequence()
 
-        private fun inside(d: Direction) = if (rotation < 0) d.right else d.left
+        private fun inside(d: CardinalDirection) = if (rotation < 0) d.right else d.left
 
         constructor(start: Node) : this(
             start,

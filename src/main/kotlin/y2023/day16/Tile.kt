@@ -1,35 +1,35 @@
 package y2023.day16
 
-import util.Direction
+import util.CardinalDirection
 
 data class Tile(val type: Char) {
-    fun divert(dir: Direction): List<Direction> {
+    fun divert(dir: CardinalDirection): List<CardinalDirection> {
         when (type) {
             '|' -> {
-                if (dir == Direction.W || dir == Direction.E)
-                    return listOf(Direction.N, Direction.S)
+                if (dir == CardinalDirection.W || dir == CardinalDirection.E)
+                    return listOf(CardinalDirection.N, CardinalDirection.S)
             }
 
             '-' -> {
-                if (dir == Direction.N || dir == Direction.S)
-                    return listOf(Direction.W, Direction.E)
+                if (dir == CardinalDirection.N || dir == CardinalDirection.S)
+                    return listOf(CardinalDirection.W, CardinalDirection.E)
             }
 
             '/' -> {
                 return when (dir) {
-                    Direction.W -> listOf(Direction.S)
-                    Direction.E -> listOf(Direction.N)
-                    Direction.N -> listOf(Direction.E)
-                    Direction.S -> listOf(Direction.W)
+                    CardinalDirection.W -> listOf(CardinalDirection.S)
+                    CardinalDirection.E -> listOf(CardinalDirection.N)
+                    CardinalDirection.N -> listOf(CardinalDirection.E)
+                    CardinalDirection.S -> listOf(CardinalDirection.W)
                 }
             }
 
             '\\' -> {
                 return when (dir) {
-                    Direction.W -> listOf(Direction.N)
-                    Direction.E -> listOf(Direction.S)
-                    Direction.N -> listOf(Direction.W)
-                    Direction.S -> listOf(Direction.E)
+                    CardinalDirection.W -> listOf(CardinalDirection.N)
+                    CardinalDirection.E -> listOf(CardinalDirection.S)
+                    CardinalDirection.N -> listOf(CardinalDirection.W)
+                    CardinalDirection.S -> listOf(CardinalDirection.E)
                 }
             }
         }

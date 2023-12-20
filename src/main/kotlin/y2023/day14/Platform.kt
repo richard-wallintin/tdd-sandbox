@@ -1,11 +1,11 @@
 package y2023.day14
 
-import util.Direction
+import util.CardinalDirection
 import y2023.day14.Lane.Companion.invert
 import y2023.day14.Lane.Companion.transpose
 
-data class Platform(val lanes: List<Lane>, val orientation: Direction = Direction.W) {
-    fun turn(d: Direction): Platform = Platform(
+data class Platform(val lanes: List<Lane>, val orientation: CardinalDirection = CardinalDirection.W) {
+    fun turn(d: CardinalDirection): Platform = Platform(
         when {
             orientation.right == d -> lanes.transpose().reversed()
             orientation.left == d -> lanes.reversed().transpose()
@@ -17,7 +17,7 @@ data class Platform(val lanes: List<Lane>, val orientation: Direction = Directio
 
     private val load by lazy { lanes.sumOf { it.load } }
 
-    fun load(d: Direction): Int {
+    fun load(d: CardinalDirection): Int {
         return turn(d).load
     }
 
@@ -25,7 +25,7 @@ data class Platform(val lanes: List<Lane>, val orientation: Direction = Directio
         lanes = lanes.map { it.tilt() }
     )
 
-    fun tilt(d: Direction): Platform {
+    fun tilt(d: CardinalDirection): Platform {
         return turn(d).tilt().turn(orientation)
     }
 
@@ -50,7 +50,7 @@ data class Platform(val lanes: List<Lane>, val orientation: Direction = Directio
         return result
     }
 
-    fun tiltCycle() = listOf(Direction.N, Direction.W, Direction.S, Direction.E)
+    fun tiltCycle() = listOf(CardinalDirection.N, CardinalDirection.W, CardinalDirection.S, CardinalDirection.E)
         .fold(this) { p, d -> p.turn(d).tilt() }.turn(orientation)
 
 
@@ -59,7 +59,7 @@ data class Platform(val lanes: List<Lane>, val orientation: Direction = Directio
     }
 
     companion object {
-        fun of(text: String, d: Direction = Direction.W) = Platform(
+        fun of(text: String, d: CardinalDirection = CardinalDirection.W) = Platform(
             text.lines().map(::Lane), d
         )
     }

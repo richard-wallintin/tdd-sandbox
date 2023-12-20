@@ -1,8 +1,8 @@
 package y2023.day10
 
-import util.Direction
+import util.CardinalDirection
 
-data class PipeSegment(val connects: Set<Direction>) {
+data class PipeSegment(val connects: Set<CardinalDirection>) {
     companion object {
         fun of(s: String): PipeSegment {
             return when (s) {
@@ -36,16 +36,16 @@ data class PipeSegment(val connects: Set<Direction>) {
     fun isStart() = connects == start
 }
 
-val vertical = setOf(Direction.N, Direction.S)
-val horizontal = setOf(Direction.E, Direction.W)
-val cornerNE = setOf(Direction.N, Direction.E)
-val cornerNW = setOf(Direction.N, Direction.W)
-val cornerSW = setOf(Direction.S, Direction.W)
-val cornernSE = setOf(Direction.S, Direction.E)
-val ground = emptySet<Direction>()
+val vertical = setOf(CardinalDirection.N, CardinalDirection.S)
+val horizontal = setOf(CardinalDirection.E, CardinalDirection.W)
+val cornerNE = setOf(CardinalDirection.N, CardinalDirection.E)
+val cornerNW = setOf(CardinalDirection.N, CardinalDirection.W)
+val cornerSW = setOf(CardinalDirection.S, CardinalDirection.W)
+val cornernSE = setOf(CardinalDirection.S, CardinalDirection.E)
+val ground = emptySet<CardinalDirection>()
 val start = setOf(
-    Direction.S,
-    Direction.E,
-    Direction.W,
-    Direction.N
+    CardinalDirection.S,
+    CardinalDirection.E,
+    CardinalDirection.W,
+    CardinalDirection.N
 )
