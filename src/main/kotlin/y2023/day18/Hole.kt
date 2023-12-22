@@ -10,7 +10,7 @@ data class Hole(
 ) {
 
     val direction = from?.location?.direction(location)
-    private val backtrack: Sequence<Hole> = sequence {
+    val backtrack: Sequence<Hole> = sequence {
         yield(this@Hole)
         from?.let { yieldAll(it.backtrack) }
     }
@@ -21,7 +21,7 @@ data class Hole(
             .sum()
     }
 
-    private val boundary by lazy { backtrack.map { it.location }.toSet() }
+    val boundary by lazy { backtrack.map { it.location }.toSet() }
     val length get() = boundary.size
 
     val interior: Set<Point> by lazy {
@@ -41,7 +41,7 @@ data class Hole(
     val size get() = boundary.size + interior.size
 
     fun dig(instruction: Instruction): Hole {
-        return List(instruction.meters) { instruction.direction }.fold(this, Hole::dig)
+        return List(instruction.units) { instruction.direction }.fold(this, Hole::dig)
     }
 
     private fun dig(direction: CardinalDirection) = Hole(
@@ -49,7 +49,23 @@ data class Hole(
         from = this
     )
 
+    fun loop(): List<Triple<CardinalDirection, Point, CardinalDirection>> {
+        val allPoints = backtrack.map { it.location }.toList()
+        assert(allPoints.toSet().size == allPoints.size - 1) { "cannot work with overlaps" }
+
+        val fwdList = backtrack.mapNotNull { h ->
+            h.direction?.let { d ->
+                d to h.location
+            }
+        }.toList().reversed()
+
+        return fwdList.zipWithNext { a, b ->
+            Triple(a.first, a.second, b.first)
+        } + Triple(fwdList.last().first, fwdList.last().second, fwdList.first().first)
+    }
+
     companion object {
-        fun Sequence<Instruction>.digTrench() = fold(Hole(), Hole::dig)
+        fun Sequence<Instruction>.digTrench(origin: Point = Point(0, 0)) =
+            fold(Hole(origin), Hole::dig)
     }
 }
