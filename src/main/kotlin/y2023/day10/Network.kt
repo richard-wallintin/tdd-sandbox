@@ -38,7 +38,7 @@ data class Network(val matrix: List<List<PipeSegment>>) {
         fun nodeAt(dir: CardinalDirection) = nodeAt(location.go(dir))
 
         val neighbours by lazy {
-            location.area().mapNotNull { nodeAt(it) }.toList()
+            location.env().mapNotNull { nodeAt(it) }.toList()
         }
 
         private fun next(direction: CardinalDirection): Node =

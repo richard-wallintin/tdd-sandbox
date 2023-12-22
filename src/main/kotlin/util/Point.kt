@@ -3,8 +3,8 @@ package util
 import kotlin.math.abs
 
 data class Point(val x: Int, val y: Int) {
-    fun go(dir: CardinalDirection) = Point(x + dir.x, y + dir.y)
-    fun area() = sequence {
+    fun go(dir: CardinalDirection, dist: Int = 1) = Point(x + dir.x * dist, y + dir.y * dist)
+    fun env() = sequence {
         for (h in -1..1) {
             for (v in -1..1) {
                 yield(Point(x + h, y + v))
@@ -16,7 +16,7 @@ data class Point(val x: Int, val y: Int) {
         return abs(x - o.x) + abs(y - o.y)
     }
 
-    fun direction(o: Point) = when {
+    infix fun direction(o: Point) = when {
         o.x > this.x -> CardinalDirection.E
         o.x < this.x -> CardinalDirection.W
         o.y > this.y -> CardinalDirection.S
@@ -31,4 +31,6 @@ data class Point(val x: Int, val y: Int) {
             yield(p)
         }
     }
+
+    infix fun area(b: Point) = abs(b.x - x) * abs(b.y - y)
 }
