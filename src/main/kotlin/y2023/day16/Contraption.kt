@@ -28,9 +28,14 @@ data class Contraption(val lines: List<String>) {
     }
 
     private fun tile(point: Point) =
-        if (point.x in (0 until size.x) && point.y in (0 until size.y)) Tile(lines[point.y][point.x]) else null
+        if (point.x in (0 until size.x) && point.y in (0 until size.y)) Tile(lines[point.y.toInt()][point.x.toInt()]) else null
 
-    fun illumination(beam: Beam = Beam(location = Point(0, 0), direction = CardinalDirection.E)): Int {
+    fun illumination(
+        beam: Beam = Beam(
+            location = Point(0, 0),
+            direction = CardinalDirection.E
+        )
+    ): Int {
         val seen = mutableSetOf(beam)
         traverse(beam, tile(beam.location) ?: return 0, seen)
         return seen.map { it.location }.toSet().size
@@ -48,9 +53,11 @@ data class Contraption(val lines: List<String>) {
 
     fun maxIllumination(): Int {
         val top = (0 until size.x).map { Point(it, 0) }.map { Beam(it, CardinalDirection.S) }
-        val bottom = (0 until size.x).map { Point(it, size.y - 1) }.map { Beam(it, CardinalDirection.N) }
+        val bottom =
+            (0 until size.x).map { Point(it, size.y - 1) }.map { Beam(it, CardinalDirection.N) }
         val left = (0 until size.y).map { Point(0, it) }.map { Beam(it, CardinalDirection.E) }
-        val right = (0 until size.y).map { Point(size.x - 1, it) }.map { Beam(it, CardinalDirection.W) }
+        val right =
+            (0 until size.y).map { Point(size.x - 1, it) }.map { Beam(it, CardinalDirection.W) }
 
         return (top + right + bottom + left).asSequence().map { illumination(it) }.max()
     }

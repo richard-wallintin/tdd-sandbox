@@ -2,8 +2,10 @@ package util
 
 import kotlin.math.abs
 
-data class Point(val x: Int, val y: Int) {
-    fun go(dir: CardinalDirection, dist: Int = 1) = Point(x + dir.x * dist, y + dir.y * dist)
+data class Point(val x: Long, val y: Long) {
+    constructor(x: Int, y: Int): this(x.toLong(), y.toLong())
+
+    fun go(dir: CardinalDirection, dist: Long = 1) = Point(x + dir.x * dist, y + dir.y * dist)
     fun env() = sequence {
         for (h in -1..1) {
             for (v in -1..1) {
@@ -12,7 +14,7 @@ data class Point(val x: Int, val y: Int) {
         }
     }.filter { it != this }
 
-    infix fun distance(o: Point): Int {
+    infix fun distance(o: Point): Long {
         return abs(x - o.x) + abs(y - o.y)
     }
 

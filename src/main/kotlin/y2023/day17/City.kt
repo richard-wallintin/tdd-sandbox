@@ -10,8 +10,8 @@ class City(val matrix: List<List<Int>>) {
         matrix.flatten().average().toInt()
     }
 
-    fun lossAt(x: Int, y: Int): Int? {
-        return matrix.getOrNull(x)?.getOrNull(y)
+    fun lossAt(x: Long, y: Long): Int? {
+        return matrix.getOrNull(x.toInt())?.getOrNull(y.toInt())
     }
 
     fun findShortestPath(
