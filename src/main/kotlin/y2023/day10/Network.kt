@@ -19,7 +19,7 @@ data class Network(val matrix: List<List<PipeSegment>>) {
     }
 
     private fun nodeAt(location: Point): Node? =
-        matrix.getOrNull(location.y)?.getOrNull(location.x)?.let { p ->
+        matrix.getOrNull(location.y.toInt())?.getOrNull(location.x.toInt())?.let { p ->
             nodes.computeIfAbsent(location) { Node(it, p) }
         }
 

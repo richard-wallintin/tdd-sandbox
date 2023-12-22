@@ -4,6 +4,7 @@ import util.CardinalDirection
 import util.CardinalDirection.*
 import util.Point
 import y2023.day18.Hole.Companion.digTrench
+import y2023.day18.Instruction.Companion.toPolygon
 import kotlin.math.abs
 
 data class Segment(
@@ -17,8 +18,8 @@ data class Segment(
 
 data class TileGrid(
     val segments: List<Segment>,
-    val xAxis: Map<Int, Int>,
-    val yAxis: Map<Int, Int>
+    val xAxis: Map<Long, Long>,
+    val yAxis: Map<Long, Long>
 ) {
     val origin = segments.first().from
 
@@ -46,9 +47,9 @@ data class TileGrid(
         }
     } ?: throw IllegalArgumentException("tile cannot be mapped: $tile")
 
-    private fun invert(map: Map<Int, Int>) = map.entries.associate { (k, v) -> v to k }
+    private fun invert(map: Map<Long, Long>) = map.entries.associate { (k, v) -> v to k }
 
-    fun fullSizeOf(tile: Point): Int {
+    fun fullSizeOf(tile: Point): Long {
         return xSizeOf(tile) * ySizeOf(tile)
     }
 
@@ -80,13 +81,13 @@ data class TileGrid(
         )
     }
 
-    fun trenchSize(): Int {
+    fun trenchSize(): Long {
         val interiorSize = trench.interior.sumOf { fullSizeOf(it) }
         val trenchArea = computeTrenchArea()
         return interiorSize + trenchArea
     }
 
-    private fun computeTrenchArea(): Int {
+    private fun computeTrenchArea(): Long {
         return trench.loop().sumOf { (enter, p, leave) ->
             boundarySizeOf(enter, leave, p)
         }
@@ -95,9 +96,7 @@ data class TileGrid(
     companion object {
         fun from(instructions: Sequence<Instruction>): TileGrid {
             val originalInstructions = instructions.toList()
-            val points = originalInstructions.runningFold(Point(0, 0)) { p, i ->
-                p.go(i.direction, i.units)
-            }
+            val points = originalInstructions.toPolygon()
             assert(originalInstructions.asSequence().map { it.direction }
                 .zipWithNext(CardinalDirection::rotation)
                 .sum() < 0) { "assuming right turning trench" }
@@ -111,8 +110,8 @@ data class TileGrid(
             )
         }
 
-        private fun gridMapping(values: List<Int>) =
-            values.toSortedSet().withIndex().associate { it.value to it.index }
+        private fun gridMapping(values: List<Long>) =
+            values.toSortedSet().withIndex().associate { it.value to it.index.toLong() }
     }
 
 }

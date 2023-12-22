@@ -41,7 +41,7 @@ data class Hole(
     val size get() = boundary.size + interior.size
 
     fun dig(instruction: Instruction): Hole {
-        return List(instruction.units) { instruction.direction }.fold(this, Hole::dig)
+        return List(instruction.units.toInt()) { instruction.direction }.fold(this, Hole::dig)
     }
 
     private fun dig(direction: CardinalDirection) = Hole(
