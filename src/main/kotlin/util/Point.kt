@@ -2,8 +2,12 @@ package util
 
 import kotlin.math.abs
 
+data class IntPoint(val x: Int, val y: Int)
+
 data class Point(val x: Long, val y: Long) {
-    constructor(x: Int, y: Int): this(x.toLong(), y.toLong())
+    constructor(x: Int, y: Int) : this(x.toLong(), y.toLong())
+
+    val int by lazy { IntPoint(x.toInt(), y.toInt()) }
 
     fun go(dir: CardinalDirection, dist: Long = 1) = Point(x + dir.x * dist, y + dir.y * dist)
     fun env() = sequence {
@@ -34,5 +38,4 @@ data class Point(val x: Long, val y: Long) {
         }
     }
 
-    infix fun area(b: Point) = abs(b.x - x) * abs(b.y - y)
 }

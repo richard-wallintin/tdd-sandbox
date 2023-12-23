@@ -41,12 +41,6 @@ data class TileGrid(
         Point(xAxis[originalPoint.x]!!, yAxis[originalPoint.y]!!)
 
 
-    private fun mapToOriginal(tile: Point) = xAxisReversed[tile.x]?.let { ox ->
-        yAxisReversed[tile.y]?.let { oy ->
-            Point(ox, oy)
-        }
-    } ?: throw IllegalArgumentException("tile cannot be mapped: $tile")
-
     private fun invert(map: Map<Long, Long>) = map.entries.associate { (k, v) -> v to k }
 
     fun fullSizeOf(tile: Point): Long {
@@ -65,7 +59,7 @@ data class TileGrid(
         enter: CardinalDirection,
         leave: CardinalDirection,
         p: Point
-    ) = when (val it = enter to leave) {
+    ) = when (enter to leave) {
         W to W -> xSizeOf(p)
         W to N -> xSizeOf(p)
         E to S -> ySizeOf(p)

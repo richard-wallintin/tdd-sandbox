@@ -19,7 +19,7 @@ data class Network(val matrix: List<List<PipeSegment>>) {
     }
 
     private fun nodeAt(location: Point): Node? =
-        matrix.getOrNull(location.y.toInt())?.getOrNull(location.x.toInt())?.let { p ->
+        matrix.getOrNull(location.int.y)?.getOrNull(location.int.x)?.let { p ->
             nodes.computeIfAbsent(location) { Node(it, p) }
         }
 
@@ -102,7 +102,7 @@ data class Network(val matrix: List<List<PipeSegment>>) {
     inner class Loop(val start: Node, val points: Set<Point>, val rotation: Int) {
         fun containedArea(): Int {
             return start.traverse().flatMap { (n, d) ->
-                allNodesLookingInside(n, d) + allNodesLookingAheadInside(n,d)
+                allNodesLookingInside(n, d) + allNodesLookingAheadInside(n, d)
             }.toSet().size
         }
 
