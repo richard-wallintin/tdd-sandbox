@@ -28,7 +28,8 @@ data class Contraption(val lines: List<String>) {
     }
 
     private fun tile(point: Point) =
-        if (point.x in (0 until size.x) && point.y in (0 until size.y)) Tile(lines[point.y.toInt()][point.x.toInt()]) else null
+        if (point.x in (0 until size.x) && point.y in (0 until size.y))
+            Tile(lines[point.int.y][point.int.x]) else null
 
     fun illumination(
         beam: Beam = Beam(
