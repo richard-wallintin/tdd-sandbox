@@ -3,6 +3,11 @@ package y2023.day19
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import y2023.day19.Selection.Companion.all
+import y2023.day19.Selection.Companion.greaterThan
+import y2023.day19.Selection.Companion.lessThan
+import y2023.day19.Selection.Companion.selectSome
+import y2023.day19.Selection.Companion.vs
 
 class WorkflowTest {
 
@@ -75,6 +80,51 @@ class WorkflowTest {
     @Test
     fun `part 1`() {
         workflowSystem(input).processAll(readParts(input)) shouldBe 323625
+    }
+
+    @Test
+    fun `part spec and selectors`() {
+        val spec = PartSpec()
+        spec.x shouldBe DEFAULT_RANGE
+        spec.m shouldBe DEFAULT_RANGE
+        spec.a shouldBe DEFAULT_RANGE
+        spec.s shouldBe DEFAULT_RANGE
+
+        Attribute.X.restrict(greaterThan(100))(spec) shouldBe selectSome(
+            PartSpec(x = 101..4000),
+            PartSpec(x = 1..100)
+        )
+
+        Attribute.M.restrict(greaterThan(2))(spec) shouldBe selectSome(
+            PartSpec(m = 3..4000),
+            PartSpec(m = 1..2),
+        )
+
+        Attribute.A.restrict(greaterThan(4000))(spec) shouldBe selectSome(
+            PartSpec(a = IntRange.EMPTY),
+            PartSpec(a = 1..4000),
+        )
+
+        Attribute.S.restrict(greaterThan(0))(spec) shouldBe Selection(
+            spec
+        )
+
+        Attribute.M.restrict(lessThan(6))(PartSpec(m = 1..10)) shouldBe
+                (PartSpec(m = 1..5) vs PartSpec(m = 6..10))
+
+        Attribute.X.restrict(all())(PartSpec(x = 3..5)) shouldBe Selection(
+            PartSpec(x = 3..5)
+        )
+    }
+
+    @Test
+    fun `a rule can select & test`() {
+        val rule = Rule.condition(Attribute.X, greaterThan(100), "A")
+        rule.select(PartSpec()) shouldBe (
+                PartSpec(x = 101..4000) vs
+                        PartSpec(x = 1..100)
+                )
+        rule.test(Part(x = 1, m = 5, a = 5, s = 5)) shouldBe false
     }
 
     private fun workflowSystem(text: String) = WorkflowSystem.of(readWorkflows(text))
