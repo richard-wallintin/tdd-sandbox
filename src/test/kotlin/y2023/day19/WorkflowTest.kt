@@ -89,6 +89,7 @@ class WorkflowTest {
         spec.m shouldBe DEFAULT_RANGE
         spec.a shouldBe DEFAULT_RANGE
         spec.s shouldBe DEFAULT_RANGE
+        spec.size shouldBe 4000L*4000L*4000L*4000L
 
         Attribute.X.restrict(greaterThan(100))(spec) shouldBe selectSome(
             PartSpec(x = 101..4000),
@@ -125,6 +126,32 @@ class WorkflowTest {
                         PartSpec(x = 1..100)
                 )
         rule.test(Part(x = 1, m = 5, a = 5, s = 5)) shouldBe false
+    }
+
+    @Test
+    fun `workflow produces spec pairs`() {
+        sampleWorkflowEx.process(PartSpec()).toList() shouldBe listOf(
+            PartSpec(x = 11..4000) to "one",
+            PartSpec(x = 1..10, m = 1..19) to "two",
+            PartSpec(x = 1..10, m = 20..4000, a = 31..4000) to "R",
+            PartSpec(x = 1..10, m = 20..4000, a = 1..30) to "A",
+        )
+    }
+
+    @Test
+    fun `system produces accepted specs`() {
+        val system = WorkflowSystem.of(sequenceOf(Workflow.of("in{x>10:A,a>30:R,A}")))
+        system.acceptSpecs().toList() shouldBe listOf(
+            PartSpec(x = 11..4000),
+            PartSpec(x = 1..10, a = 1..30)
+        )
+
+        workflowSystem(referenceData).acceptSpecs().sumOf { it.size } shouldBe 167409079868000
+    }
+
+    @Test
+    fun `part 2`() {
+        workflowSystem(input).acceptSpecs().sumOf { it.size } shouldBe 127447746739409L
     }
 
     private fun workflowSystem(text: String) = WorkflowSystem.of(readWorkflows(text))

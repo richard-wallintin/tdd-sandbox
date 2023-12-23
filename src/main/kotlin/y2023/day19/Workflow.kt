@@ -11,6 +11,15 @@ data class Workflow(
         return rules.first { it.test(part) }.result
     }
 
+    fun process(spec: PartSpec): Sequence<Pair<PartSpec, String>> = sequence {
+        var remaining: PartSpec = spec
+        rules.forEach {
+            val (selected, rest) = it.select(remaining)
+            yield(selected to it.result)
+            remaining = rest ?: return@sequence
+        }
+    }
+
     companion object {
         fun of(s: String) =
             Regex("(\\w+)\\{(.+?)\\}").matchEntire(s)?.destructured?.let { (name, rules) ->
