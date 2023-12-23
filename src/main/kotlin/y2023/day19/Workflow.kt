@@ -1,5 +1,8 @@
 package y2023.day19
 
+import y2023.day19.Selection.Companion.greaterThan
+import y2023.day19.Selection.Companion.lessThan
+
 data class Workflow(
     val name: String,
     val rules: List<Rule>
@@ -16,29 +19,28 @@ data class Workflow(
 
         private fun rule(s: String) =
             Regex("([xmas])([<>])(\\d+):(\\w+)").matchEntire(s)?.destructured?.let { (a, c, v, r) ->
-                Rule(r, predicate(a, c, v.toInt()))
-            } ?: Rule(s) { true }
+                Rule.condition(Attribute.of(a), selector(c, v.toInt()), r)
+            } ?: Rule(s)
 
-        private fun predicate(
-            attribute: String,
-            comparison: String,
-            value: Int
-        ): (Part) -> Boolean {
-            val getter: (Part) -> Int = when (attribute) {
-                "x" -> Part::x
-                "m" -> Part::m
-                "a" -> Part::a
-                "s" -> Part::s
-                else -> throw IllegalArgumentException("attribute $attribute")
-            }
-            val check: (Int) -> Boolean = when (comparison) {
-                ">" -> { i -> i > value }
-                "<" -> { i -> i < value }
+        private fun selector(comparison: String, value: Int): Selector<IntRange> {
+            return when (comparison) {
+                ">" -> greaterThan(value)
+                "<" -> lessThan(value)
                 else -> throw IllegalArgumentException("comparison $comparison")
             }
-            return { p -> check(getter(p)) }
         }
     }
 }
 
-data class Rule(val result: String, val test: (Part) -> Boolean)
+data class Rule(
+    val result: String,
+    val select: Selector<PartSpec> = Selection.all(),
+    val test: Test = { true }
+) {
+
+    companion object {
+        fun condition(attribute: Attribute, selector: Selector<IntRange>, result: String): Rule {
+            return Rule(result, attribute.restrict(selector), attribute.test(selector))
+        }
+    }
+}
