@@ -19,7 +19,10 @@ data class PartSpec(
     val m: IntRange = DEFAULT_RANGE,
     val a: IntRange = DEFAULT_RANGE,
     val s: IntRange = DEFAULT_RANGE,
-)
+) {
+    private fun sizeOf(r: IntRange): Long = (r.last - r.first + 1).toLong()
+    val size: Long by lazy { sizeOf(x) * sizeOf(m) * sizeOf(a) * sizeOf(s) }
+}
 
 data class Selection<T>(
     val selected: T,
