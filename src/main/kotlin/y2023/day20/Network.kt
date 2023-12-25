@@ -37,31 +37,47 @@ class Network(moduleList: NetworkState) {
 
     private val currentState: NetworkState get() = modules.toMap()
 
-    private suspend fun SequenceScope<Pulse>.enqueue(
-        q: Queue<Pulse>,
-        start: Pulse
-    ) {
-        q.offer(start.also { yield(it) })
+    private suspend fun SequenceScope<Pulse>.enqueue(q: Queue<Pulse>, pulse: Pulse) {
+        yield(pulse)
+        q.offer(pulse)
     }
 
-    private fun cycle(maxRounds: Long): Pair<Long, Long> {
+    private fun warmup(maxRounds: Int = 1_000) = sequence {
         val seen = mutableSetOf(currentState)
-        var (high, low) = 0 to 0
         (1..maxRounds).forEach { round ->
             pushButton().forEach {
-                if (it.high) high++ else low++
+                yield(round to it)
             }
             if (!seen.add(currentState))
-                return round to (high.toLong() * low.toLong())
+                return@sequence
         }
-        System.err.println("no cycle detected after 1000 button pushes")
-        return maxRounds to (high.toLong() * low.toLong())
     }
 
-    fun cyclePulseValue(totalRounds: Long = 1_000): Long {
+    private fun forever() = sequence {
+        var round = 0L
+        while (true) {
+            round++
+            pushButton().forEach { yield(round to it) }
+        }
+    }
+
+    private fun cycle(maxRounds: Int): Pair<Int, Long> {
+        var (high, low) = 0 to 0
+
+        val lastRound = warmup(maxRounds).onEach { (_, pulse) ->
+            if (pulse.high) high++ else low++
+        }.maxOf { it.first }
+
+        return lastRound to (high.toLong() * low.toLong())
+    }
+
+    fun cyclePulseValue(totalRounds: Int = 1_000): Long {
         val (cycle, pulseValue) = cycle(totalRounds)
         return pulseValue * (totalRounds / cycle).let { it * it }
     }
+
+    fun firstRound(predicate: (Pulse) -> Boolean) =
+        forever().first { (_, pulse) -> predicate(pulse) }.first
 
     companion object {
         fun setup(sampleInput: String): Network {
@@ -69,5 +85,4 @@ class Network(moduleList: NetworkState) {
                 .associateBy(Module::name))
         }
     }
-
 }

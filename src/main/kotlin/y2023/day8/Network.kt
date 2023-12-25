@@ -1,5 +1,6 @@
 package y2023.day8
 
+import util.lcm
 import java.math.BigInteger
 
 enum class Direction(val go: (Node) -> String) {
@@ -9,12 +10,6 @@ enum class Direction(val go: (Node) -> String) {
         fun String.navigationInstructions() =
             toList().map(Char::toString).map(Direction::valueOf)
     }
-}
-
-fun lcm(a: BigInteger, b: BigInteger?): BigInteger {
-    val gcd = a.gcd(b)
-    val absProduct = a.multiply(b).abs()
-    return absProduct.divide(gcd)
 }
 
 typealias NodeSelector = (Node) -> Boolean
