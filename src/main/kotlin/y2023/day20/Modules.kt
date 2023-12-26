@@ -47,6 +47,7 @@ data class ConjunctionModule(
     override val connect: List<String>,
     private val status: Map<String, PulseValue> = emptyMap()
 ) : Module() {
+    val inputs = status.keys
 
     override fun add(input: String) = copy(
         status = status + (input to PulseValue.LOW)

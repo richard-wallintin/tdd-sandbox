@@ -1,5 +1,7 @@
 package y2023.day20
 
+import util.lcm
+import java.math.BigInteger
 import java.util.*
 
 typealias NetworkState = Map<String, Module>
@@ -14,6 +16,8 @@ class Network(moduleList: NetworkState) {
             }
         }
     }
+
+    val allModules get() = modules.values.toList()
 
     private fun module(name: String) =
         modules[name] ?: throw IllegalStateException("module $name unknown")
@@ -76,8 +80,29 @@ class Network(moduleList: NetworkState) {
         return pulseValue * (totalRounds / cycle).let { it * it }
     }
 
-    fun firstRound(predicate: (Pulse) -> Boolean) =
-        forever().first { (_, pulse) -> predicate(pulse) }.first
+    fun firstLow(name: String) = firstLow(module(name))
+
+    private fun firstLow(module: Module): Long = when (module) {
+        is SinkModule -> firstLow(allModules.first { it.connect.contains(module.name) })
+        is ConjunctionModule -> findFirstLow(module)
+        else -> throw IllegalArgumentException("cannot compute first low of $module")
+    }
+
+    private fun findFirstLow(module: ConjunctionModule): Long {
+        val lengths = mutableMapOf<String, Long>()
+        val inputs = module.inputs
+
+        forever().filter { it.second.high && it.second.to == module.name }
+            .forEach { (round, pulse) ->
+                lengths.putIfAbsent(pulse.from, round)
+
+                if (lengths.keys == inputs) {
+                    return lengths.values.map { BigInteger.valueOf(it) }.reduce(::lcm)
+                        .longValueExact()
+                }
+            }
+        throw IllegalStateException("reached end of forever...")
+    }
 
     companion object {
         fun setup(sampleInput: String): Network {

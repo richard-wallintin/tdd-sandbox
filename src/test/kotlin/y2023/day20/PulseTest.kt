@@ -2,7 +2,6 @@ package y2023.day20
 
 import AOC
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class PulseTest {
@@ -111,8 +110,8 @@ class PulseTest {
         inputNetwork.cyclePulseValue() shouldBe 684125385
     }
 
-    @Test @Disabled("need proper algorithm")
+    @Test
     fun `part 2`() {
-        inputNetwork.firstRound { p: Pulse -> p.low && (p.to == "rx") } shouldBe 42
+        inputNetwork.firstLow("rx") shouldBe 225872806380073L
     }
 }
