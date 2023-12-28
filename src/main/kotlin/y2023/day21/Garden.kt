@@ -38,6 +38,21 @@ data class Garden(
         .runningReduce { (a0, a1), (b0, b1) -> listOf(a0 + b0, a1 + b1) }
         .flatten()
 
+    fun findParabola(steps: Long): Parabola {
+        val mod = steps.mod(baseSize.x)
+        val halfSize = baseSize.x / 2
+        assert(mod == halfSize)
+        assert(baseSize.y / 2 == halfSize)
+        assert(start.x == halfSize)
+
+        val (p1, p2, p3) = totalReachable().withIndex()
+            .take((5 * baseSize.x + mod + 1).toInt()).filter {
+                it.index.toLong().mod(baseSize.x) == mod
+            }.drop(2).take(3).map { Point(it.index.toLong(), it.value) }.toList()
+
+        return Parabola.of(p1, p2, p3)
+    }
+
     companion object {
         fun of(text: String): Garden {
             var start: Point? = null
