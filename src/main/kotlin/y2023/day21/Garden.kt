@@ -2,7 +2,6 @@ package y2023.day21
 
 import util.CardinalDirection
 import util.Point
-import java.util.*
 
 data class Garden(
     val baseSize: Point,
@@ -12,30 +11,7 @@ data class Garden(
     data class Step(val distance: Int, val point: Point)
 
     fun reach(steps: Int): Int {
-        val mod2 = steps.mod(2)
-        return shortestPath(start).take(steps + 1).withIndex().filter {
-            it.index.mod(2) == mod2
-        }.sumOf { it.value }.toInt()
-    }
-
-    private fun computeDistances(from: Point, maxSteps: Int): Map<Point, Int> {
-        val distances = mutableMapOf(from to 0)
-
-        val q: Queue<Step> = LinkedList()
-        q.offer(Step(0, from))
-        while (q.isNotEmpty()) {
-            val (d, p) = q.remove()
-            if (d > maxSteps) break
-
-            CardinalDirection.entries.map(p::go)
-                .filter(::walkable)
-                .filter { !distances.containsKey(it) }
-                .forEach {
-                    distances[it] = d + 1
-                    q.offer(Step(d + 1, it))
-                }
-        }
-        return distances
+        return totalReachable(start).take(steps + 1).last().toInt()
     }
 
     private fun walkable(it: Point) = it.mod(baseSize) !in rocks
@@ -57,7 +33,7 @@ data class Garden(
         }
     }
 
-    fun totalReachable() = shortestPath()
+    fun totalReachable(from: Point = start) = shortestPath(from)
         .chunked(2)
         .runningReduce { (a0, a1), (b0, b1) -> listOf(a0 + b0, a1 + b1) }
         .flatten()
