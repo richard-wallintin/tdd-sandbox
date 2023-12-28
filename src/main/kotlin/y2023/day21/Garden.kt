@@ -5,29 +5,14 @@ import util.Point
 import java.util.*
 
 data class Garden(
-    val size: Point,
+    val baseSize: Point,
     val start: Point,
     val rocks: Set<Point>
 ) {
     data class Step(val distance: Int, val point: Point)
 
     fun reach(steps: Int): Int {
-        val q: Queue<Step> = LinkedList()
-        q.offer(Step(0, start))
-
-        val distances = mutableMapOf(start to 0)
-
-        while (q.isNotEmpty()) {
-            val (d, p) = q.remove()
-            if(d > steps) break
-
-            CardinalDirection.entries.map(p::go).filter { it in size }.filter { it !in rocks }
-                .filter { !distances.containsKey(it) }
-                .forEach {
-                    distances[it] = d +1
-                    q.offer(Step(d + 1, it))
-                }
-        }
+        val distances = computeDistances(start, steps)
 
         val inverseDistances = distances.entries.groupingBy { it.value }.eachCount()
 
@@ -35,6 +20,46 @@ data class Garden(
             inverseDistances[it] ?: 0
         }
     }
+
+    private fun computeDistances(from: Point, maxSteps: Int): Map<Point, Int> {
+        val distances = mutableMapOf(from to 0)
+
+        val q: Queue<Step> = LinkedList()
+        q.offer(Step(0, from))
+        while (q.isNotEmpty()) {
+            val (d, p) = q.remove()
+            if (d > maxSteps) break
+
+            CardinalDirection.entries.map(p::go)
+                .filter(::walkable)
+                .filter { !distances.containsKey(it) }
+                .forEach {
+                    distances[it] = d + 1
+                    q.offer(Step(d + 1, it))
+                }
+        }
+        return distances
+    }
+
+    private fun walkable(it: Point) = it.mod(baseSize) !in rocks
+    fun reachable(): Sequence<Long> = sequence {
+        yield(1L)
+
+        val seen = mutableSetOf(start)
+        var nextPoints = listOf(start)
+
+        while (nextPoints.isNotEmpty()) {
+            nextPoints = nextPoints.flatMap { p ->
+                CardinalDirection.entries.map(p::go)
+                    .filter(::walkable)
+                    .filter(seen::add)
+            }
+
+            yield(nextPoints.size.toLong())
+        }
+    }
+
+    fun reachableGrowthRate() = reachable().zipWithNext { a, b -> b - a }
 
     companion object {
         fun of(text: String): Garden {
@@ -49,7 +74,7 @@ data class Garden(
             }.map(::Point).max() + Point(1, 1)
 
             return Garden(
-                size = size,
+                baseSize = size,
                 start = start ?: throw IllegalArgumentException("no 'S' in $text"),
                 rocks = rocks.toSet()
             )

@@ -41,11 +41,13 @@ data class Point(val x: Long, val y: Long) : Comparable<Point> {
 
     operator fun plus(o: Point) = copy(x = x + o.x, y = y + o.y)
 
-    override fun compareTo(o: Point): Int {
-        return (x + y).compareTo(o.x + o.y)
+    override fun compareTo(other: Point): Int {
+        return (x + y).compareTo(other.x + other.y)
     }
 
     operator fun contains(o: Point): Boolean {
         return o.x in (0..<x) && o.y in (0..<y)
     }
+
+    fun mod(r: Point) = Point(x.mod(r.x), y.mod(r.y))
 }
