@@ -4,8 +4,9 @@ import kotlin.math.abs
 
 data class IntPoint(val x: Int, val y: Int)
 
-data class Point(val x: Long, val y: Long) {
+data class Point(val x: Long, val y: Long) : Comparable<Point> {
     constructor(x: Int, y: Int) : this(x.toLong(), y.toLong())
+    constructor(p: Pair<Int, Int>) : this(p.first, p.second)
 
     val int by lazy { IntPoint(x.toInt(), y.toInt()) }
 
@@ -38,4 +39,13 @@ data class Point(val x: Long, val y: Long) {
         }
     }
 
+    operator fun plus(o: Point) = copy(x = x + o.x, y = y + o.y)
+
+    override fun compareTo(o: Point): Int {
+        return (x + y).compareTo(o.x + o.y)
+    }
+
+    operator fun contains(o: Point): Boolean {
+        return o.x in (0..<x) && o.y in (0..<y)
+    }
 }
