@@ -23,6 +23,8 @@ class GardenTest {
     """.trimIndent()
 
     private val referenceGarden = Garden.of(referenceInput)
+    private val inputGarden = Garden.of(AOC.getInput("/2023/day21.txt"))
+    private val emptyGarden = Garden.of("S")
 
     @Test
     fun `read garden map`() {
@@ -47,7 +49,7 @@ class GardenTest {
 
     @Test
     fun `part 1`() {
-        Garden.of(AOC.getInput("/2023/day21.txt")).reach(64) shouldBe 3724
+        inputGarden.reach(64) shouldBe 3724
     }
 
     @Test
@@ -75,11 +77,49 @@ class GardenTest {
 
     @Test
     fun `empty garden`() {
-        val empty = Garden.of("S")
+        val empty = emptyGarden
         empty.reach(1) shouldBe 4
         empty.reach(2) shouldBe 9
         empty.reach(3) shouldBe 16
         empty.reach(4) shouldBe 25
         empty.reach(5) shouldBe 36
+    }
+
+    @Test
+    fun `quadratic function`() {
+        Parabola.of(
+            Point(-1, 1),
+            Point(0, 0),
+            Point(1, 1)
+        ) shouldBe Parabola(a = 1, b = 0, c = 0)
+
+        Parabola.of(
+            Point(-1, 2),
+            Point(0, 1),
+            Point(1, 2)
+        ) shouldBe Parabola(a = 1, b = 0, c = 1)
+    }
+
+    @Test
+    fun `try some parabolas for the empty garden`() {
+        val emptyGardenFormula = Parabola(1, 2, 1)
+        Parabola.of(Point(1, 4), Point(2, 9), Point(3, 16)) shouldBe
+                emptyGardenFormula
+
+        emptyGardenFormula(4) shouldBe 25
+        emptyGardenFormula(5) shouldBe 36
+        emptyGardenFormula(6) shouldBe 49
+    }
+
+    @Test
+    fun `part 2`() {
+        val steps = 26_501_365
+        steps shouldBe 202_300 * 131 + 65
+
+        val parabola = inputGarden.findParabola(26_501_365)
+        parabola(131 + 65) shouldBe inputGarden.reach(131 + 65)
+        parabola(2 * 131 + 65) shouldBe inputGarden.reach(2 * 131 + 65)
+        parabola(3 * 131 + 65) shouldBe inputGarden.reach(3 * 131 + 65)
+        parabola(26_501_365) shouldBe 620348631910321L
     }
 }
