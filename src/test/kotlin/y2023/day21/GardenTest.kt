@@ -40,6 +40,8 @@ class GardenTest {
         referenceGarden.reach(1) shouldBe 2
         referenceGarden.reach(2) shouldBe 4
         referenceGarden.reach(3) shouldBe 6
+        referenceGarden.reach(4) shouldBe 9
+        referenceGarden.reach(5) shouldBe 13
         referenceGarden.reach(6) shouldBe 16
     }
 
@@ -59,17 +61,25 @@ class GardenTest {
 
     @Test
     fun `express reachable tiles as growth rate`() {
-        referenceGarden.reachable().take(1 + 20).toList() shouldBe
+        referenceGarden.shortestPath().take(1 + 20).toList() shouldBe
                 listOf(
                     1,
                     2, 3, 4, 5, 7, 7, 9, 14, 19, 20,
                     22, 24, 26, 25, 26, 30, 30, 36, 47, 51
                 )
 
-        referenceGarden.reachableGrowthRate().take(20).toList() shouldBe
-                listOf(
-                    1,1,1,1,2,0,2,5,5,1,
-                    2,2,2,-1,1,4,0,6,11,4
-                )
+        referenceGarden.totalReachable().take(7).toList() shouldBe listOf(
+            1, 2, 4, 6, 9, 13, 16
+        )
+    }
+
+    @Test
+    fun `empty garden`() {
+        val empty = Garden.of("S")
+        empty.reach(1) shouldBe 4
+        empty.reach(2) shouldBe 9
+        empty.reach(3) shouldBe 16
+        empty.reach(4) shouldBe 25
+        empty.reach(5) shouldBe 36
     }
 }
