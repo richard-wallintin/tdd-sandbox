@@ -12,13 +12,10 @@ data class Garden(
     data class Step(val distance: Int, val point: Point)
 
     fun reach(steps: Int): Int {
-        val distances = computeDistances(start, steps)
-
-        val inverseDistances = distances.entries.groupingBy { it.value }.eachCount()
-
-        return IntProgression.fromClosedRange(steps.mod(2), steps, 2).sumOf {
-            inverseDistances[it] ?: 0
-        }
+        val mod2 = steps.mod(2)
+        return shortestPath(start).take(steps + 1).withIndex().filter {
+            it.index.mod(2) == mod2
+        }.sumOf { it.value }.toInt()
     }
 
     private fun computeDistances(from: Point, maxSteps: Int): Map<Point, Int> {
@@ -42,11 +39,12 @@ data class Garden(
     }
 
     private fun walkable(it: Point) = it.mod(baseSize) !in rocks
-    fun reachable(): Sequence<Long> = sequence {
+
+    fun shortestPath(from: Point = start): Sequence<Long> = sequence {
         yield(1L)
 
-        val seen = mutableSetOf(start)
-        var nextPoints = listOf(start)
+        val seen = mutableSetOf(from)
+        var nextPoints = listOf(from)
 
         while (nextPoints.isNotEmpty()) {
             nextPoints = nextPoints.flatMap { p ->
@@ -59,7 +57,10 @@ data class Garden(
         }
     }
 
-    fun reachableGrowthRate() = reachable().zipWithNext { a, b -> b - a }
+    fun totalReachable() = shortestPath()
+        .chunked(2)
+        .runningReduce { (a0, a1), (b0, b1) -> listOf(a0 + b0, a1 + b1) }
+        .flatten()
 
     companion object {
         fun of(text: String): Garden {
