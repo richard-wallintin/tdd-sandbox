@@ -28,7 +28,7 @@ class GardenTest {
     fun `read garden map`() {
         val garden = referenceGarden
 
-        garden.size shouldBe Point(11, 11)
+        garden.baseSize shouldBe Point(11, 11)
         garden.start shouldBe Point(5, 5)
         garden.rocks shouldContain Point(5, 1)
         garden.rocks shouldContain Point(9, 9)
@@ -46,5 +46,30 @@ class GardenTest {
     @Test
     fun `part 1`() {
         Garden.of(AOC.getInput("/2023/day21.txt")).reach(64) shouldBe 3724
+    }
+
+    @Test
+    fun `infinite garden`() {
+        referenceGarden.reach(10) shouldBe 50
+        referenceGarden.reach(50) shouldBe 1594
+        referenceGarden.reach(100) shouldBe 6536
+        referenceGarden.reach(500) shouldBe 167004
+        // larger numbers take too long to compute (now)
+    }
+
+    @Test
+    fun `express reachable tiles as growth rate`() {
+        referenceGarden.reachable().take(1 + 20).toList() shouldBe
+                listOf(
+                    1,
+                    2, 3, 4, 5, 7, 7, 9, 14, 19, 20,
+                    22, 24, 26, 25, 26, 30, 30, 36, 47, 51
+                )
+
+        referenceGarden.reachableGrowthRate().take(20).toList() shouldBe
+                listOf(
+                    1,1,1,1,2,0,2,5,5,1,
+                    2,2,2,-1,1,4,0,6,11,4
+                )
     }
 }
