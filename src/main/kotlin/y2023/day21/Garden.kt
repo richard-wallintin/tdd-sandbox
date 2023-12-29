@@ -1,6 +1,7 @@
 package y2023.day21
 
 import util.CardinalDirection
+import util.Parabola
 import util.Point
 
 data class Garden(

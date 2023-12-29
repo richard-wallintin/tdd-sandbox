@@ -4,6 +4,7 @@ import AOC
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import util.Parabola
 import util.Point
 
 class GardenTest {
