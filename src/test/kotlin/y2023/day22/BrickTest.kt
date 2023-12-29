@@ -4,8 +4,10 @@ import AOC
 import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import util.Point3D
+import y2023.day22.Brick.Companion.fallPotential
 import y2023.day22.Brick.Companion.safe
 import y2023.day22.BrickStack.Companion.settle
 
@@ -20,6 +22,8 @@ class BrickTest {
         0,1,6~2,1,6
         1,1,8~1,1,9
     """.trimIndent()
+
+    private val inputBricks = Brick.ofMany(AOC.getInput("/2023/day22.txt"))
 
     @Test
     fun `read a brick`() {
@@ -109,34 +113,61 @@ class BrickTest {
         )
     }
 
-    @Test
-    fun `compute support graph`() {
-        val stack = BrickStack.of(Brick.ofMany(referenceInput))
-        val (a, b, c, d, e) = stack.settled
-        val f = stack.settled[5]
-        val g = stack.settled[6]
-
-        stack.support(a) shouldBe listOf(b, c)
-        stack.supportedCount(a) shouldBe 0
-        stack.supportedCount(b) shouldBe 1
-        stack.supportedCount(c) shouldBe 1
-
-        stack.support(b) shouldBe listOf(d, e)
-        stack.support(c) shouldBe listOf(d, e)
-        stack.support(d) shouldBe listOf(f)
-        stack.support(e) shouldBe listOf(f)
-        stack.support(f) shouldBe listOf(g)
-        stack.support(g) shouldBe listOf()
-    }
 
     @Test
     fun `find safe to disintegrate brick count`() {
         Brick.ofMany(referenceInput).safe() shouldBe 5
     }
 
+
     @Test
     fun `part 1`() {
-        Brick.ofMany(AOC.getInput("/2023/day22.txt")).safe().also(::println) shouldBeLessThan 1012
+        inputBricks.safe() shouldBeLessThan 1012
+    }
+
+    @Test
+    fun `fall potential for reference`() {
+        Brick.ofMany(referenceInput).fallPotential() shouldBe 7
+    }
+
+    @Test
+    fun `part 2`() {
+        inputBricks.fallPotential() shouldBe 74594
+    }
+
+    @Nested
+    inner class WithReferenceStack {
+        private val stack = BrickStack.of(Brick.ofMany(referenceInput))
+        private val a = stack.settled[0]
+        private val b = stack.settled[1]
+        private val c = stack.settled[2]
+        private val d = stack.settled[3]
+        private val e = stack.settled[4]
+        private val f = stack.settled[5]
+        private val g = stack.settled[6]
+
+        @Test
+        fun `compute support graph`() {
+            stack.support(a) shouldBe listOf(b, c)
+            stack.supportedCount(a) shouldBe 0
+            stack.supportedCount(b) shouldBe 1
+            stack.supportedCount(c) shouldBe 1
+
+            stack.support(b) shouldBe listOf(d, e)
+            stack.support(c) shouldBe listOf(d, e)
+            stack.support(d) shouldBe listOf(f)
+            stack.support(e) shouldBe listOf(f)
+            stack.support(f) shouldBe listOf(g)
+            stack.support(g) shouldBe listOf()
+        }
+
+        @Test
+        fun `compute chain reaction potential`() {
+            stack.fall(a) shouldBe 6
+            stack.fall(b) shouldBe 0
+            stack.fall(f) shouldBe 1
+            stack.fall(g) shouldBe 0
+        }
     }
 }
 

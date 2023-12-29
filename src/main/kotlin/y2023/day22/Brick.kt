@@ -37,6 +37,7 @@ data class Brick(val start: Point3D, val end: Point3D) {
         fun ofMany(text: String) = text.lines().map { of(it) }
 
         fun List<Brick>.safe(): Int = BrickStack.of(this).safeCount()
+        fun List<Brick>.fallPotential(): Int = BrickStack.of(this).fallPotential()
     }
 
     fun support(above: List<Brick>) =

@@ -1,5 +1,7 @@
 package y2023.day22
 
+import java.util.*
+
 data class BrickStack(val settled: List<Brick>) {
     private val supportMap: Map<Brick, List<Brick>> by lazy {
         sequence {
@@ -11,18 +13,41 @@ data class BrickStack(val settled: List<Brick>) {
             }
         }.toMap()
     }
-    private val supportedCountMap = mutableMapOf<Brick, Int>()
+    private val supportedMap = mutableMapOf<Brick, Set<Brick>>()
 
     fun support(b: Brick) = supportMap[b] ?: emptyList()
-    fun supportedCount(b: Brick) = supportedCountMap.getOrPut(b) {
-        supportMap.values.count { b in it }
+    private fun supported(b: Brick): Set<Brick> = supportedMap.getOrPut(b) {
+        supportMap.filter { b in it.value }.keys
     }
+
+    fun supportedCount(b: Brick) = supported(b).size
 
     fun safeCount() = settled.count { safeCount(it) }
 
     private fun safeCount(b: Brick): Boolean {
         return support(b).all { supportedCount(it) > 1 }
     }
+
+    private fun falling(start: Brick): Set<Brick> {
+        val fallen = mutableSetOf(start)
+
+        val q: Queue<Brick> = LinkedList()
+        q.offer(start)
+        while(q.isNotEmpty()){
+            val b = q.remove()
+            support(b).filter {
+                fallen.containsAll(supported(it))
+            }.filter {
+                fallen.add(it)
+            }.forEach {
+                q.offer(it)
+            }
+        }
+        return fallen
+    }
+
+    fun fall(b: Brick): Int = falling(b).size - 1
+    fun fallPotential() = settled.sumOf { fall(it) }
 
     companion object {
         fun of(bricks: List<Brick>) = BrickStack(bricks.settle())
@@ -31,9 +56,11 @@ data class BrickStack(val settled: List<Brick>) {
             val settled = mutableListOf<Brick>()
 
             sortedBy { it.bottom }.forEach { fallingBrick ->
-                val fallenBrick = settled.filter { it.horizontalOverlap(fallingBrick) }.maxByOrNull { it.top }?.let {
-                    fallingBrick.elevateTo(it.top + 1)
-                } ?: fallingBrick.elevateTo(1)
+                val fallenBrick =
+                    settled.filter { it.horizontalOverlap(fallingBrick) }.maxByOrNull { it.top }
+                        ?.let {
+                            fallingBrick.elevateTo(it.top + 1)
+                        } ?: fallingBrick.elevateTo(1)
 
                 settled.add(fallenBrick)
             }
