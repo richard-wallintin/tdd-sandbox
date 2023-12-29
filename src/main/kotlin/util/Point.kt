@@ -40,6 +40,7 @@ data class Point(val x: Long, val y: Long) : Comparable<Point> {
     }
 
     operator fun plus(o: Point) = copy(x = x + o.x, y = y + o.y)
+    operator fun plus(distance: Long) = copy(x = x + distance, y = y + distance)
 
     override fun compareTo(other: Point): Int {
         return (x + y).compareTo(other.x + other.y)
@@ -50,4 +51,6 @@ data class Point(val x: Long, val y: Long) : Comparable<Point> {
     }
 
     fun mod(r: Point) = Point(x.mod(r.x), y.mod(r.y))
+
+    fun topLeft(o: Point) = x <= o.x && y <= o.y
 }
