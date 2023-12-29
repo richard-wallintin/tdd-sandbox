@@ -1,6 +1,5 @@
 package util
 
-import kotlin.math.pow
 import kotlin.math.roundToLong
 
 data class Parabola(val a: Double = 1.0, val b: Double = 0.0, val c: Double = 0.0) :
@@ -27,5 +26,4 @@ data class Parabola(val a: Double = 1.0, val b: Double = 0.0, val c: Double = 0.
     }
 
     override fun invoke(x: Long) = (a * x * x + b * x + c).roundToLong()
-    fun compute(x: Double) = a * x.pow(2) + b * x + c
 }

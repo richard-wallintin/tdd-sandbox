@@ -9,8 +9,6 @@ data class Garden(
     val start: Point,
     val rocks: Set<Point>
 ) {
-    data class Step(val distance: Int, val point: Point)
-
     fun reach(steps: Int): Int {
         return totalReachable(start).take(steps + 1).last().toInt()
     }
