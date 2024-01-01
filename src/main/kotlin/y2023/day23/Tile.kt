@@ -14,4 +14,7 @@ data class Tile(val path: Boolean, val slope: CardinalDirection? = null) {
             else -> throw IllegalArgumentException("unknown tile '$c'")
         }
     }
+
+    override fun toString() =
+        if (path) "." else "#"
 }

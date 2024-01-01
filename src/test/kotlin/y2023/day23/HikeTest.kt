@@ -1,6 +1,7 @@
 package y2023.day23
 
 import AOC
+import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import util.CardinalDirection
@@ -49,11 +50,23 @@ class HikeTest {
 
     @Test
     fun `find longest hike`() {
-        referenceIsland.hikeLength shouldBe 94
+        referenceIsland.longestHikeLength shouldBe 94
     }
+
+    private val islandMap = IslandMap.of(AOC.getInput("2023/day23.txt"))
 
     @Test
     fun `part 1`() {
-        IslandMap.of(AOC.getInput("2023/day23.txt")).hikeLength shouldBe 2106
+        islandMap.longestHikeLength shouldBe 2106
+    }
+
+    @Test
+    fun `longest hike ignoring slopes`() {
+        referenceIsland.longestHikeLengthIgnoringSlopes shouldBe 154
+    }
+
+    @Test
+    fun `part 2`() {
+        islandMap.longestHikeLengthIgnoringSlopes.also(::println) shouldBeGreaterThan 2106
     }
 }
