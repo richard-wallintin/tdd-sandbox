@@ -20,32 +20,62 @@ data class IslandMap(val tiles: List<List<Tile>>) {
         return tiles.getOrNull(point.int.x)?.getOrNull(point.int.y) ?: Tile(path = false)
     }
 
-    data class Hike(val length: Int, val to: Point, val prev: Hike? = null) {
-        fun next() = CardinalDirection.entries.map { go(it) }
-        fun go(d: CardinalDirection): Hike = copy(length = length + 1, to = to.go(d), prev = this)
+    data class Hike(val length: Int, val to: Point, val tile: Tile, val prev: Hike? = null) {
+        private fun directions(ignoreSlopes: Boolean) =
+            if (ignoreSlopes) CardinalDirection.entries
+            else tile.slope?.let { listOf(it) } ?: CardinalDirection.entries
+
+        private fun immediateNext(lookup: (Point) -> Tile, ignoreSlopes: Boolean) =
+            directions(ignoreSlopes).map { go(it, lookup) }
+                .filter { it.tile.path }
+                .filter { !this.seen(it.to) }
+
+        private fun straight(lookup: (Point) -> Tile, ignoreSlopes: Boolean): Hike {
+            val n = immediateNext(lookup, ignoreSlopes)
+            return if (n.size == 1) n.first().straight(lookup, ignoreSlopes) else this
+        }
+
+        fun next(lookup: (Point) -> Tile, ignoreSlopes: Boolean) =
+            immediateNext(lookup, ignoreSlopes).map { it.straight(lookup, ignoreSlopes) }
+
+        fun go(d: CardinalDirection, lookup: (Point) -> Tile): Hike = to.go(d).let {
+            copy(length = length + 1, to = it, tile = lookup(it), prev = this)
+        }
+
         fun seen(p: Point): Boolean = to == p || prev?.seen(p) ?: false
+        fun distance(p: Point) = to.distance(p)
     }
 
-    private fun check(h: Hike): Hike? = tile(h.to).let { tile ->
-        if (tile.path) {
-            tile.slope?.let { check(h.go(it)) } ?: h
-        } else null
-    }
+    val longestHikeLength: Int by lazy { search(ignoreSlopes = false).first() }
+    val longestHikeLengthIgnoringSlopes: Int by lazy { search(ignoreSlopes = true).max() }
 
-
-    val hikeLength: Int by lazy { search().max() }
-
-    private fun search() = sequence {
+    private fun search(ignoreSlopes: Boolean) = sequence {
         val q = PriorityQueue(
-            compareBy<Hike> { it.length }.reversed()
+            compareBy<Hike> { it.distance(finish) }.then(compareBy { it.length }).reversed()
         )
-        q.add(Hike(0, start))
+        q.add(Hike(0, start, tile(start)))
+
         while (q.isNotEmpty()) {
             val hike = q.remove()
-            if (hike.to == finish) yield(hike.length)
-            hike.next().mapNotNull { check(it) }
-                .filter { !hike.seen(it.to) }
-                .forEach(q::add)
+
+
+            if (hike.to == finish) {
+                println("===> RESULT")
+                visualize(hike)
+                yield(hike.length)
+            }
+
+            hike.next(::tile, ignoreSlopes).forEach(q::add)
+        }
+    }
+
+    private fun visualize(h: Hike) {
+        println("Hike: ${h.length}")
+        (0..<size).forEach { y ->
+            (0..<size).joinToString("") { x ->
+                val p = Point(x, y)
+                if (h.seen(p)) "O" else tile(p).toString()
+            }.let(::println)
         }
     }
 
