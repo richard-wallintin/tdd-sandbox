@@ -14,14 +14,14 @@ data class IslandMap(val tiles: List<List<Tile>>) {
     }
 
     val start = (0..<size).map { Point(it, 0) }.first { tile(it).path }
-
     val finish = (0..<size).map { Point(it, size - 1) }.first { tile(it).path }
+
     fun tile(point: Point): Tile {
         return tiles.getOrNull(point.int.x)?.getOrNull(point.int.y) ?: Tile(path = false)
     }
 
     data class Hike(
-        val length: Int = 0, val dead: Int = 0,
+        val length: Int = 0,
         val to: Point, val tile: Tile,
         val prev: Hike? = null
     ) {
@@ -40,18 +40,9 @@ data class IslandMap(val tiles: List<List<Tile>>) {
         }
 
         fun next(lookup: (Point) -> Tile, ignoreSlopes: Boolean): List<Hike> {
-            val branches = immediateNext(lookup, ignoreSlopes)
+            return immediateNext(lookup, ignoreSlopes)
                 .map { it.continueStraight(lookup, ignoreSlopes) }
                 .filter { !(it.prev?.seen(it.to) ?: false) }
-            if (branches.size <= 1) return branches
-            else {
-                val branchLengths = branches.map { it.length - this.length + 1 }
-
-                return branches.mapIndexed { index, branch ->
-                    val otherBranches = branchLengths.filterIndexed { idx, _ -> idx != index }.sum()
-                    branch.copy(dead = dead + otherBranches)
-                }
-            }
         }
 
         fun go(d: CardinalDirection, lookup: (Point) -> Tile): Hike = to.go(d).let {
@@ -69,7 +60,6 @@ data class IslandMap(val tiles: List<List<Tile>>) {
         val q = PriorityQueue(
             compareBy<Hike> { it.distance(finish) }.reversed()
                     then compareBy<Hike> { it.length }.reversed()
-                    then compareBy<Hike> { it.dead }
         )
         q.add(Hike(0, to = start, tile = tile(start)))
 
@@ -78,14 +68,12 @@ data class IslandMap(val tiles: List<List<Tile>>) {
 
             if (hike.to == finish) yield(hike.length)
 
-            hike.next(::tile, ignoreSlopes)
-                //.onEach { println("BRANCH: "); visualize(it) }
-                .forEach(q::add)
+            q.addAll(hike.next(::tile, ignoreSlopes))
         }
     }
 
     private fun visualize(h: Hike) {
-        println("Hike: ${h.length} (Dead: ${h.dead})")
+        println("Hike: ${h.length}")
         (0..<size).forEach { y ->
             (0..<size).joinToString("") { x ->
                 val p = Point(x, y)
