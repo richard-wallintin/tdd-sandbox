@@ -82,7 +82,7 @@ class HikeTest {
             ###.#
             ###.#
         """.trimIndent()
-        ).toGraph() shouldBe WeightedGraph(
+        ).toGraph(true) shouldBe WeightedGraph(
             setOf(
                 Edge(Point(1, 0), Point(3, 4), 6)
             )
@@ -99,7 +99,7 @@ class HikeTest {
             .....
             ##.##
         """.trimIndent()
-        ).toGraph()
+        ).toGraph(true)
 
         graph shouldBe WeightedGraph(
             setOf(
@@ -110,7 +110,7 @@ class HikeTest {
             )
         )
 
-        graph.shortestPath(Point(1, 0), Point(2, 4), Point::distance)
+        graph.shortestPaths(Point(1, 0), Point(2, 4), Point::distance)
             .first() shouldBe 7
     }
 
@@ -123,6 +123,18 @@ class HikeTest {
         ).invert() shouldBe WeightedGraph(
             setOf(
                 Edge(Point(1, 0), Point(3, 4), -6)
+            )
+        )
+    }
+
+    @Test
+    fun `find longest path`() {
+        WeightedGraph(
+            setOf(
+                Edge(Point(1, 0), Point(1, 1), 1),
+                Edge(Point(1, 1), Point(2, 3), 5),
+                Edge(Point(1, 1), Point(2, 3), 7),
+                Edge(Point(2, 3), Point(2, 4), 1),
             )
         )
     }

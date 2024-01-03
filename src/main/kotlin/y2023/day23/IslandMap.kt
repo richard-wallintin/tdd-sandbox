@@ -94,19 +94,19 @@ data class IslandMap(val tiles: List<List<Tile>>) {
         }
     }
 
-    fun toGraph(): WeightedGraph<Point> {
+    fun toGraph(ignoreSlopes: Boolean): WeightedGraph<Point> {
 
-        return WeightedGraph(edges())
+        return WeightedGraph(edges(ignoreSlopes))
     }
 
-    private fun edges(): Set<Edge<Point>> {
+    private fun edges(ignoreSlopes: Boolean): Set<Edge<Point>> {
         val q: Queue<Hike> = LinkedList()
         q.offer(Hike(to = start, tile = tile(start)))
         val seen = mutableSetOf<Edge<Point>>()
         while (q.isNotEmpty()) {
             val h = q.remove()
 
-            h.next(::tile, true).filter {
+            h.next(::tile, ignoreSlopes).filter {
                 seen.add(Edge(h.to, it.to, it.length - h.length))
             }.forEach(q::add)
 
