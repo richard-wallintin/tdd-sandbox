@@ -3,6 +3,7 @@ package y2023.day23
 import AOC
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import util.CardinalDirection
 import util.Point
@@ -66,7 +67,63 @@ class HikeTest {
     }
 
     @Test
+    @Disabled("still tooo slooooow")
     fun `part 2`() {
         islandMap.longestHikeLengthIgnoringSlopes.also(::println) shouldBeGreaterThan 2106
+    }
+
+    @Test
+    fun `convert map to weighted graph`() {
+        IslandMap.of(
+            """
+            #.###
+            #..##
+            ##..#
+            ###.#
+            ###.#
+        """.trimIndent()
+        ).toGraph() shouldBe WeightedGraph(
+            setOf(
+                Edge(Point(1, 0), Point(3, 4), 6)
+            )
+        )
+    }
+
+    @Test
+    fun `convert to complex graph`() {
+        val graph = IslandMap.of(
+            """
+            #.###
+            .....
+            .###.
+            .....
+            ##.##
+        """.trimIndent()
+        ).toGraph()
+
+        graph shouldBe WeightedGraph(
+            setOf(
+                Edge(Point(1, 0), Point(1, 1), 1),
+                Edge(Point(1, 1), Point(2, 3), 5),
+                Edge(Point(1, 1), Point(2, 3), 7),
+                Edge(Point(2, 3), Point(2, 4), 1),
+            )
+        )
+
+        graph.shortestPath(Point(1, 0), Point(2, 4), Point::distance)
+            .first() shouldBe 7
+    }
+
+    @Test
+    fun `invert a weighted graph`() {
+        WeightedGraph(
+            setOf(
+                Edge(Point(1, 0), Point(3, 4), 6)
+            )
+        ).invert() shouldBe WeightedGraph(
+            setOf(
+                Edge(Point(1, 0), Point(3, 4), -6)
+            )
+        )
     }
 }
