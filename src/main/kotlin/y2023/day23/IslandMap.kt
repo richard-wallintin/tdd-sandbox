@@ -20,7 +20,11 @@ data class IslandMap(val tiles: List<List<Tile>>) {
         return tiles.getOrNull(point.int.x)?.getOrNull(point.int.y) ?: Tile(path = false)
     }
 
-    data class Hike(val length: Int, val to: Point, val tile: Tile, val prev: Hike? = null) {
+    data class Hike(
+        val length: Int = 0, val dead: Int = 0,
+        val to: Point, val tile: Tile,
+        val prev: Hike? = null
+    ) {
         private fun directions(ignoreSlopes: Boolean) =
             if (ignoreSlopes) CardinalDirection.entries
             else tile.slope?.let { listOf(it) } ?: CardinalDirection.entries
@@ -28,15 +32,27 @@ data class IslandMap(val tiles: List<List<Tile>>) {
         private fun immediateNext(lookup: (Point) -> Tile, ignoreSlopes: Boolean) =
             directions(ignoreSlopes).map { go(it, lookup) }
                 .filter { it.tile.path }
-                .filter { !this.seen(it.to) }
+                .filter { this.prev?.let { preLoc -> preLoc.to != it.to } ?: true }
 
-        private fun straight(lookup: (Point) -> Tile, ignoreSlopes: Boolean): Hike {
+        private fun continueStraight(lookup: (Point) -> Tile, ignoreSlopes: Boolean): Hike {
             val n = immediateNext(lookup, ignoreSlopes)
-            return if (n.size == 1) n.first().straight(lookup, ignoreSlopes) else this
+            return if (n.size == 1) n.first().continueStraight(lookup, ignoreSlopes) else this
         }
 
-        fun next(lookup: (Point) -> Tile, ignoreSlopes: Boolean) =
-            immediateNext(lookup, ignoreSlopes).map { it.straight(lookup, ignoreSlopes) }
+        fun next(lookup: (Point) -> Tile, ignoreSlopes: Boolean): List<Hike> {
+            val branches = immediateNext(lookup, ignoreSlopes)
+                .map { it.continueStraight(lookup, ignoreSlopes) }
+                .filter { !(it.prev?.seen(it.to) ?: false) }
+            if (branches.size <= 1) return branches
+            else {
+                val branchLengths = branches.map { it.length - this.length + 1 }
+
+                return branches.mapIndexed { index, branch ->
+                    val otherBranches = branchLengths.filterIndexed { idx, _ -> idx != index }.sum()
+                    branch.copy(dead = dead + otherBranches)
+                }
+            }
+        }
 
         fun go(d: CardinalDirection, lookup: (Point) -> Tile): Hike = to.go(d).let {
             copy(length = length + 1, to = it, tile = lookup(it), prev = this)
@@ -51,32 +67,51 @@ data class IslandMap(val tiles: List<List<Tile>>) {
 
     private fun search(ignoreSlopes: Boolean) = sequence {
         val q = PriorityQueue(
-            compareBy<Hike> { it.distance(finish) }.then(compareBy { it.length }).reversed()
+            compareBy<Hike> { it.distance(finish) }.reversed()
+                    then compareBy<Hike> { it.length }.reversed()
+                    then compareBy<Hike> { it.dead }
         )
-        q.add(Hike(0, start, tile(start)))
+        q.add(Hike(0, to = start, tile = tile(start)))
 
         while (q.isNotEmpty()) {
             val hike = q.remove()
 
+            if (hike.to == finish) yield(hike.length)
 
-            if (hike.to == finish) {
-                println("===> RESULT")
-                visualize(hike)
-                yield(hike.length)
-            }
-
-            hike.next(::tile, ignoreSlopes).forEach(q::add)
+            hike.next(::tile, ignoreSlopes)
+                //.onEach { println("BRANCH: "); visualize(it) }
+                .forEach(q::add)
         }
     }
 
     private fun visualize(h: Hike) {
-        println("Hike: ${h.length}")
+        println("Hike: ${h.length} (Dead: ${h.dead})")
         (0..<size).forEach { y ->
             (0..<size).joinToString("") { x ->
                 val p = Point(x, y)
                 if (h.seen(p)) "O" else tile(p).toString()
             }.let(::println)
         }
+    }
+
+    fun toGraph(): WeightedGraph<Point> {
+
+        return WeightedGraph(edges())
+    }
+
+    private fun edges(): Set<Edge<Point>> {
+        val q: Queue<Hike> = LinkedList()
+        q.offer(Hike(to = start, tile = tile(start)))
+        val seen = mutableSetOf<Edge<Point>>()
+        while (q.isNotEmpty()) {
+            val h = q.remove()
+
+            h.next(::tile, true).filter {
+                seen.add(Edge(h.to, it.to, it.length - h.length))
+            }.forEach(q::add)
+
+        }
+        return seen
     }
 
     companion object {
