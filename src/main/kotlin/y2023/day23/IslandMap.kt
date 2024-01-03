@@ -53,10 +53,13 @@ data class IslandMap(val tiles: List<List<Tile>>) {
         fun distance(p: Point) = to.distance(p)
     }
 
-    val longestHikeLength: Int by lazy { search(ignoreSlopes = false).first() }
-    val longestHikeLengthIgnoringSlopes: Int by lazy { search(ignoreSlopes = true).max() }
+    val longestHikeLength: Int by lazy { search().first() }
+    val longestHikeLengthIgnoringSlopes: Int by lazy {
+        toGraph(ignoreSlopes = true).longestPath(start, finish)?.toInt()
+            ?: throw IllegalStateException("no path from start to finish?")
+    }
 
-    private fun search(ignoreSlopes: Boolean) = sequence {
+    private fun search() = sequence {
         val q = PriorityQueue(
             compareBy<Hike> { it.distance(finish) }.reversed()
                     then compareBy<Hike> { it.length }.reversed()
@@ -68,7 +71,7 @@ data class IslandMap(val tiles: List<List<Tile>>) {
 
             if (hike.to == finish) yield(hike.length)
 
-            q.addAll(hike.next(::tile, ignoreSlopes))
+            q.addAll(hike.next(::tile, false))
         }
     }
 

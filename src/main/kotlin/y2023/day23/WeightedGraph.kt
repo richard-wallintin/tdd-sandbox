@@ -17,40 +17,47 @@ data class Edge<N>(val nodes: Set<N>, val weight: Long) {
         return "$from <=[$weight]=> $to"
     }
 
-    fun other(node: N) = if (from == node) to else from
-    fun invert() = copy(weight = -weight)
+    fun other(node: N) =
+        if (from == node) to
+        else if (to == node) from
+        else throw IllegalArgumentException("$node not in $this")
 }
 
 data class WeightedGraph<N>(val edges: Set<Edge<N>>) {
-    private val links = mutableMapOf<N, Map<N, Long>>()
-
-    val minWeight by lazy { edges.minOf { it.weight } }
-    val maxWeight by lazy { edges.maxOf { it.weight } }
+    private val links = mutableMapOf<N, List<Pair<N, Long>>>()
 
     private fun links(n: N) = links.getOrPut(n) {
         edges.filter { it.nodes.contains(n) }.map {
             it.other(n) to it.weight
-        }.toMap()
+        }
     }
 
     inner class Path(val node: N, val length: Long = 0) {
         fun next() =
-            links(node).entries.map { (n, w) -> Path(node = n, length = length + w) }
+            links(node).map { (n, w) -> Path(node = n, length = length + w) }
     }
 
-    fun shortestPaths(start: N, finish: N, heuristic: (N, N) -> Long) = sequence {
+    fun shortestPath(start: N, finish: N, heuristic: (N, N) -> Long): Long {
         val q = PriorityQueue(compareBy<Path> { it.length + heuristic(it.node, finish) })
         q.add(Path(start))
-        val seen = mutableSetOf(start)
 
         while (q.isNotEmpty()) {
             val p = q.remove()
 
-            if (p.node == finish) yield(p.length)
+            if (p.node == finish) return p.length
 
-            q.addAll(p.next().filter { seen.add(it.node) })
+            q.addAll(p.next())
         }
+
+        throw IllegalStateException("did not find a path from $start to $finish")
     }
 
-    fun invert() = copy(edges = edges.map { it.invert() }.toSet())
+    fun longestPath(start: N, finish: N, visited: Set<N> = emptySet()): Long? {
+        if (start == finish) return 0
+        val newVisited = visited + start
+        return links(start).mapNotNull { (next, weight) ->
+            if (visited.contains(next)) null
+            else longestPath(next, finish, newVisited)?.plus(weight)
+        }.maxOrNull()
+    }
 }
