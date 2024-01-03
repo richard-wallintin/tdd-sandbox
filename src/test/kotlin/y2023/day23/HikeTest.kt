@@ -1,7 +1,6 @@
 package y2023.day23
 
 import AOC
-import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -67,9 +66,9 @@ class HikeTest {
     }
 
     @Test
-    @Disabled("still tooo slooooow")
+    @Disabled("works but is to slow")
     fun `part 2`() {
-        islandMap.longestHikeLengthIgnoringSlopes.also(::println) shouldBeGreaterThan 2106
+        islandMap.longestHikeLengthIgnoringSlopes shouldBe 6350
     }
 
     @Test
@@ -110,21 +109,7 @@ class HikeTest {
             )
         )
 
-        graph.shortestPaths(Point(1, 0), Point(2, 4), Point::distance)
-            .first() shouldBe 7
-    }
-
-    @Test
-    fun `invert a weighted graph`() {
-        WeightedGraph(
-            setOf(
-                Edge(Point(1, 0), Point(3, 4), 6)
-            )
-        ).invert() shouldBe WeightedGraph(
-            setOf(
-                Edge(Point(1, 0), Point(3, 4), -6)
-            )
-        )
+        graph.shortestPath(Point(1, 0), Point(2, 4), Point::distance) shouldBe 7
     }
 
     @Test
@@ -136,6 +121,6 @@ class HikeTest {
                 Edge(Point(1, 1), Point(2, 3), 7),
                 Edge(Point(2, 3), Point(2, 4), 1),
             )
-        )
+        ).longestPath(Point(1, 0), Point(2, 4)) shouldBe 9
     }
 }
