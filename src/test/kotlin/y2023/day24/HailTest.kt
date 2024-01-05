@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import util.Matrix.Companion.column
 import util.Matrix.Companion.matrix
+import util.Point3D
 import y2023.day24.Hailstone.Companion.allPairs
 import y2023.day24.Hailstone.Companion.intersectingHailStones
 
@@ -22,21 +23,21 @@ class HailTest {
     fun `parse hailstone`() {
         Hailstone.of("19, 13, 30 @ -2,  1, -2") shouldBe
                 Hailstone(
-                    position = Vector3D(19, 13, 30),
-                    velocity = Vector3D(-2, 1, -2)
+                    position = Point3D(19, 13, 30),
+                    velocity = Point3D(-2, 1, -2)
                 )
     }
 
     @Test
     fun movement() {
         Hailstone.of("20, 19, 15 @ 1, -5, -3").next().position shouldBe
-                Vector3D(21, 14, 12)
+                Point3D(21, 14, 12)
     }
 
     @Test
     fun `parse from actual data`() {
         Hailstone.of("260252047346974, 360095837456982, 9086018216578 @ 66, -174, 512").position shouldBe
-                Vector3D(260252047346974, 360095837456982, 9086018216578)
+                Point3D(260252047346974, 360095837456982, 9086018216578)
     }
 
     @Test
