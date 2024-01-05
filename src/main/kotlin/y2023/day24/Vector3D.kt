@@ -7,5 +7,11 @@ data class Vector3D(val x: Long, val y: Long, val z: Long) {
         z = z + o.z
     )
 
+    operator fun times(f: Long) = copy(
+        x = x * f,
+        y = y * f,
+        z = z * f
+    )
+
     override fun toString() = "($x, $y, $z)"
 }
