@@ -1,8 +1,9 @@
 package y2023.day24
 
+import util.Point3D
 import kotlin.math.roundToLong
 
-data class Hailstone(val position: Vector3D, val velocity: Vector3D) {
+data class Hailstone(val position: Point3D, val velocity: Point3D) {
     fun next() = copy(position = position + velocity)
 
     private val slope = velocity.y.toDouble() / velocity.x.toDouble()
@@ -30,8 +31,8 @@ data class Hailstone(val position: Vector3D, val velocity: Vector3D) {
             Regex("([+-]?\\d+),\\s+([+-]?\\d+),\\s+([+-]?\\d+)\\s+@\\s+([+-]?\\d+),\\s+([+-]?\\d+),\\s+([+-]?\\d+)")
                 .matchEntire(s)?.destructured?.let { (px, py, pz, vx, vy, vz) ->
                     Hailstone(
-                        position = Vector3D(px.toLong(), py.toLong(), pz.toLong()),
-                        velocity = Vector3D(vx.toLong(), vy.toLong(), vz.toLong())
+                        position = Point3D(px.toLong(), py.toLong(), pz.toLong()),
+                        velocity = Point3D(vx.toLong(), vy.toLong(), vz.toLong())
                     )
                 } ?: throw IllegalArgumentException("no hailstone: '$s'")
 
