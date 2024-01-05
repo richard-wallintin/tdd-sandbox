@@ -3,6 +3,8 @@ package y2023.day24
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import util.Matrix.Companion.column
+import util.Matrix.Companion.matrix
 import y2023.day24.Hailstone.Companion.allPairs
 import y2023.day24.Hailstone.Companion.intersectingHailStones
 
@@ -59,10 +61,65 @@ class HailTest {
         Hailstone.ofMany(referenceInput).intersectingHailStones(7L..27L) shouldBe 2
     }
 
+    private val hailstones = Hailstone.ofMany(AOC.getInput("/2023/day24.txt"))
+
     @Test
     fun `part 1`() {
-        Hailstone.ofMany(AOC.getInput("/2023/day24.txt")).intersectingHailStones(
+        hailstones.intersectingHailStones(
             200000000000000L..400000000000000L
         ) shouldBe 12015
     }
+
+    @Test
+    fun `solve part 2 step by step`() {
+        val s = hailstones.take(6).toList()
+
+        val solutionXY = matrix(
+            mkRow(s[0], s[1]),
+            mkRow(s[1], s[2]),
+            mkRow(s[2], s[3]),
+            mkRow(s[3], s[4])
+        ).solve(
+            column(
+                mkResult(s[0], s[1]),
+                mkResult(s[1], s[2]),
+                mkResult(s[2], s[3]),
+                mkResult(s[3], s[4])
+            )
+        ).round()
+
+        solutionXY shouldBe column(472612107765508, 270148844447628, -5, -333)
+
+        val xr = solutionXY[0, 0].toLong()
+        val yr = solutionXY[1, 0].toLong()
+        val vxr = solutionXY[3, 0].toLong()
+
+        val t0 = (s[0].position.x - xr) / (vxr - s[0].velocity.x)
+        t0 shouldBe 532230727866
+        val zr0 = s[0].position.z + s[0].velocity.z * t0
+
+        val t1 = (s[1].position.x - xr) / (vxr - s[1].velocity.x)
+        t1 shouldBe 733302300048
+        val zr1 = s[1].position.z + s[1].velocity.z * t1
+
+        val vzr = (zr0 - zr1) / (t0 - t1)
+        val zr = zr0 - (vzr * t0)
+
+        zr shouldBe 273604689965980
+
+        (xr + yr + zr) shouldBe 1016365642179116
+    }
+
+    private fun mkResult(s0: Hailstone, s1: Hailstone) =
+        -(s0.position.x * s0.velocity.y) +
+                (s0.position.y * s0.velocity.x) +
+                (s1.position.x * s1.velocity.y) -
+                (s1.position.y * s1.velocity.x)
+
+    private fun mkRow(s0: Hailstone, s1: Hailstone) = listOf(
+        s1.velocity.y - s0.velocity.y,
+        -(s1.velocity.x - s0.velocity.x),
+        s1.position.x - s0.position.x,
+        -(s1.position.y - s0.position.y)
+    )
 }
