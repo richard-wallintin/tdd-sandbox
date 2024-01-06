@@ -30,10 +30,6 @@ class WireTest {
 
     @Test
     fun `parse graph`() {
-        configurations(referenceInput).take(1).toList() shouldBe listOf(
-            "jqt" to listOf("rhn", "xhk", "nvd")
-        )
-
         referenceGraph.edges.size shouldBe 33
     }
 
@@ -52,15 +48,15 @@ class WireTest {
         ).groups.size shouldBe 2
     }
 
+    private val referenceSplitEdges = setOf(
+        Edge("hfx", "pzl"),
+        Edge("bvb", "cmg"),
+        Edge("nvd", "jqt")
+    )
+
     @Test
     fun `remove example edges`() {
-        val split = referenceGraph.removeEdges(
-            setOf(
-                Edge("hfx", "pzl"),
-                Edge("bvb", "cmg"),
-                Edge("nvd", "jqt")
-            )
-        )
+        val split = referenceGraph.removeEdges(referenceSplitEdges)
         split.groups.size shouldBe 2
         split.splitWeight shouldBe 54
     }
@@ -85,21 +81,23 @@ class WireTest {
         )
     }
 
-    @Test @Disabled("infinite..")
+    private val graph = parseGraph(AOC.getInput("/2023/day25.txt"))
+
+    @Test
+    @Disabled("too slow, need better algorithm")
     fun `part 1`() {
-        parseGraph(AOC.getInput("/2023/day25.txt")).findSplit().first().splitWeight shouldBe 42
+        graph.findSplit().first().splitWeight shouldBe 42
     }
 
     private fun parseGraph(text: String) = WeightedGraph(
-        configurations(text).toList().flatMap { (from, others) ->
+        text.lineSequence().map {
+            val cfg = it.split(Regex("\\s+"))
+            val module = cfg.first().dropLast(1)
+            val connected = cfg.drop(1)
+            module to connected
+        }.toList().flatMap { (from, others) ->
             others.map { Edge(from, it, 1) }
         }.toSet()
     )
 
-    private fun configurations(text: String) = text.lineSequence().map {
-        val cfg = it.split(Regex("\\s+"))
-        val module = cfg.first().dropLast(1)
-        val connected = cfg.drop(1)
-        module to connected
-    }
 }

@@ -9,12 +9,10 @@ data class Edge<N>(val nodes: Set<N>, val weight: Long = 1) {
         assert(nodes.size == 2)
     }
 
-    val from get() = nodes.first()
-    val to get() = nodes.last()
+    val from = nodes.first()
+    val to = nodes.last()
 
-    override fun toString(): String {
-        return "$from <=[$weight]=> $to"
-    }
+    override fun toString() = "$from <=[$weight]=> $to"
 
     fun other(node: N) =
         if (from == node) to
@@ -28,10 +26,6 @@ data class WeightedGraph<N>(val edges: Set<Edge<N>>) {
         edges.filter { it.nodes.contains(n) }.map {
             it.other(n) to it.weight
         }
-    }
-
-    val splitWeight by lazy {
-        groups.map { it.size }.reduce(Int::times)
     }
 
     inner class Path(val node: N, val length: Long = 0) {
@@ -65,13 +59,17 @@ data class WeightedGraph<N>(val edges: Set<Edge<N>>) {
 
     fun removeEdges(remove: Set<Edge<N>>) = copy(edges = edges - remove)
 
-    fun findSplit(subset: Int = 3): Sequence<WeightedGraph<N>> = edges.toList().pick(subset)
+    fun findSplit(): Sequence<WeightedGraph<N>> =
+        bruteForceFindSplit(edges.toList())
+
+    private fun bruteForceFindSplit(candidates: List<Edge<N>>) = candidates.pick(3)
         .filter { this.distinct(it) }
         .map { removeEdges(it.toSet()) }
         .filter { it.groups.size > 1 }
 
-    private fun distinct(edges: List<Edge<N>>) = edges.flatMap { it.nodes }.toSet().size == 6
 
+    private fun distinct(edges: List<Edge<N>>) =
+        edges.flatMap { it.nodes }.toSet().size == edges.size * 2
 
     val groups by lazy {
         edges.fold(emptySet(), ::mergeGroups)
@@ -83,6 +81,10 @@ data class WeightedGraph<N>(val edges: Set<Edge<N>>) {
         val remainingGroups = groups - setOf(groupA, groupB)
         val newJointGroup = groupA + groupB
         return remainingGroups + setOf(newJointGroup)
+    }
+
+    val splitWeight by lazy {
+        groups.map { it.size }.reduce(Int::times)
     }
 }
 
