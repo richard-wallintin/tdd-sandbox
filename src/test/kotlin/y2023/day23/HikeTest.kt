@@ -5,7 +5,9 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import util.CardinalDirection
+import util.Edge
 import util.Point
+import util.WeightedGraph
 
 class HikeTest {
 
