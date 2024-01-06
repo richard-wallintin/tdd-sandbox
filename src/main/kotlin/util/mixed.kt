@@ -45,3 +45,9 @@ fun <T> List<T>.pick(n: Int): Sequence<List<T>> =
             }
         }
     }
+
+fun <K, V : Any> Sequence<Map<K, V>>.mergeMaps(remappingFunction: (V, V) -> V) =
+    fold(mutableMapOf<K, V>()) { acc, map ->
+        map.forEach { (k, v) -> acc.merge(k, v, remappingFunction) }
+        acc
+    }.toMap()

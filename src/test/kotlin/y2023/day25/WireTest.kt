@@ -89,6 +89,73 @@ class WireTest {
         graph.findSplit().first().splitWeight shouldBe 42
     }
 
+    @Test
+    fun `get nodes from graph`() {
+        referenceGraph.nodes.size shouldBe 15
+        graph.nodes.size shouldBe 1423
+    }
+
+    @Test
+    fun `compute edge flow`() {
+        val g = parseGraph(
+            """
+            a: b
+            b: c
+            c: d e
+        """.trimIndent()
+        )
+
+        g.edgeFlow("a") shouldBe mapOf(
+            Edge("a", "b") to 4,
+            Edge("b", "c") to 3,
+            Edge("c", "d") to 1,
+            Edge("c", "e") to 1
+        )
+    }
+
+    @Test
+    fun `edge flow on structure sample`() {
+        val g = parseGraph(
+            """
+            l1: l2 l4 l5
+            l2: l3 l4 l5 l6
+            l3: l5 l6
+            l4: l5 r1
+            l5: l6 r2
+            l6: r3
+            r1: r2 r4 r5
+            r2: r3 r4 r5 r6
+            r3: r5 r6
+            r4: r5
+            r5: r6
+            r6:
+        """.trimIndent()
+        )
+
+        val l1 = g.edgeFlow("l1")
+        l1.filterKeys {
+            it in setOf(
+                Edge("l4", "r1"),
+                Edge("l5", "r2"),
+                Edge("l6", "r3")
+            )
+        }.values.sum() shouldBe 6
+
+        val totalStats = g.edgeFlow()
+
+        totalStats.maxBy { it.value }.key shouldBe Edge("l5", "r2")
+    }
+
+    @Test
+    fun `edge flow stats on full graph`() {
+        val culprits =
+            graph.edgeFlow(10).entries.sortedBy { it.value }.takeLast(3).map { it.key }.toSet()
+
+        val splitGraph = graph.removeEdges(culprits)
+        splitGraph.groups.size shouldBe 2
+        splitGraph.splitWeight shouldBe 506202
+    }
+
     private fun parseGraph(text: String) = WeightedGraph(
         text.lineSequence().map {
             val cfg = it.split(Regex("\\s+"))
