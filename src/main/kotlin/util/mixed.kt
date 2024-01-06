@@ -32,3 +32,16 @@ fun lcm(a: BigInteger, b: BigInteger): BigInteger {
     val absProduct = a.multiply(b).abs()
     return absProduct.divide(gcd)
 }
+
+fun <T> List<T>.pick(n: Int): Sequence<List<T>> =
+    if (n >= size) sequenceOf(this)
+    else if (n == 0) sequenceOf(emptyList())
+    else sequence {
+        (0..size - n).forEach { i ->
+            val p = get(i)
+            val rest = drop(i + 1)
+            rest.pick(n - 1).forEach {
+                yield(listOf(p) + it)
+            }
+        }
+    }

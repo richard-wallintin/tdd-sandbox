@@ -1,10 +1,9 @@
-package y2023.day23
+package util
 
 import java.util.*
 
-data class Edge<N>(val nodes: Set<N>, val weight: Long) {
-    constructor(from: N, to: N, weight: Long) : this(setOf(from, to), weight)
-    constructor(from: N, to: N, weight: Int) : this(setOf(from, to), weight.toLong())
+data class Edge<N>(val nodes: Set<N>, val weight: Long = 1) {
+    constructor(from: N, to: N, weight: Int = 1) : this(setOf(from, to), weight.toLong())
 
     init {
         assert(nodes.size == 2)
@@ -25,11 +24,14 @@ data class Edge<N>(val nodes: Set<N>, val weight: Long) {
 
 data class WeightedGraph<N>(val edges: Set<Edge<N>>) {
     private val links = mutableMapOf<N, List<Pair<N, Long>>>()
-
     private fun links(n: N) = links.getOrPut(n) {
         edges.filter { it.nodes.contains(n) }.map {
             it.other(n) to it.weight
         }
+    }
+
+    val splitWeight by lazy {
+        groups.map { it.size }.reduce(Int::times)
     }
 
     inner class Path(val node: N, val length: Long = 0) {
@@ -60,4 +62,27 @@ data class WeightedGraph<N>(val edges: Set<Edge<N>>) {
             else longestPath(next, finish, newVisited)?.plus(weight)
         }.maxOrNull()
     }
+
+    fun removeEdges(remove: Set<Edge<N>>) = copy(edges = edges - remove)
+
+    fun findSplit(subset: Int = 3): Sequence<WeightedGraph<N>> = edges.toList().pick(subset)
+        .filter { this.distinct(it) }
+        .map { removeEdges(it.toSet()) }
+        .filter { it.groups.size > 1 }
+
+    private fun distinct(edges: List<Edge<N>>) = edges.flatMap { it.nodes }.toSet().size == 6
+
+
+    val groups by lazy {
+        edges.fold(emptySet(), ::mergeGroups)
+    }
+
+    private fun mergeGroups(groups: Set<Set<N>>, edge: Edge<N>): Set<Set<N>> {
+        val groupA = groups.firstOrNull { edge.from in it } ?: setOf(edge.from)
+        val groupB = groups.firstOrNull { edge.to in it } ?: setOf(edge.to)
+        val remainingGroups = groups - setOf(groupA, groupB)
+        val newJointGroup = groupA + groupB
+        return remainingGroups + setOf(newJointGroup)
+    }
 }
+
