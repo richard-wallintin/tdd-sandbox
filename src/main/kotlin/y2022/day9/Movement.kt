@@ -4,8 +4,8 @@ import util.CardinalDirection
 import util.split
 
 data class Movement(val d: CardinalDirection, val steps: Int) {
-    fun applyTo(r: Rope) = trace(r).last()
-    fun trace(start: Rope) = toDirections().runningFold(start, Rope::move)
+    fun applyTo(r: AbstractRope) = trace(r).last()
+    fun trace(start: AbstractRope) = toDirections().runningFold(start, AbstractRope::move)
 
     private fun toDirections() = (1..steps).asSequence().map { d }
 
@@ -18,11 +18,11 @@ data class Movement(val d: CardinalDirection, val steps: Int) {
             line.split().let { (d, s) -> Movement(CardinalDirection.of(d), s.toInt()) }
 
 
-        fun Sequence<Movement>.trace(start: Rope) =
+        fun Sequence<Movement>.trace(start: AbstractRope) =
             flatMap { it.toDirections() }
-                .runningFold(start, Rope::move)
+                .runningFold(start, AbstractRope::move)
 
-        fun Sequence<Movement>.traceTail(start: Rope) = trace(start).map { it.tail }.toSet().size
+        fun Sequence<Movement>.traceTail(start: AbstractRope) = trace(start).map { it.tail }.toSet().size
     }
 
 }
