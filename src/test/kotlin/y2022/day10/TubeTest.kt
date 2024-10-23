@@ -61,9 +61,11 @@ class TubeTest {
         ) shouldBe simpleProgram
     }
 
+    private val largerSample = Program.parse(AOC.getInput("2022/day10-a.txt"))
+
     @Test
     fun `can execute larger sample`() {
-        val program = Program.parse(AOC.getInput("2022/day10-a.txt"))
+        val program = largerSample
 
         CPU().trace(program).take(20).last().signal shouldBe 420
         CPU().trace(program).take(60).last().signal shouldBe 1140
@@ -71,10 +73,55 @@ class TubeTest {
         CPU().signalTrace(program) shouldBe 13140
     }
 
+    private val puzzle = Program.parse(AOC.getInput("2022/day10.txt"))
+
     @Test
     fun `part 1`() {
         CPU().signalTrace(
-            Program.parse(AOC.getInput("2022/day10.txt"))
+            puzzle
         ) shouldBe 15260
+    }
+
+    @Test
+    fun `compute pixel lit for cpu state`() {
+        val trace = CPU().trace(largerSample)
+        val (c1, c2, c3) = trace.take(3).map { CRT(it) }.toList()
+
+        c1.pixel shouldBe 0
+        c1.lit shouldBe true
+
+        c2.pixel shouldBe 1
+        c2.lit shouldBe true
+
+        c3.pixel shouldBe 2
+        c3.lit shouldBe false
+
+        trace.take(21).map { CRT(it).char }.joinToString("") { it.toString() } shouldBe
+                "##..##..##..##..##..#"
+    }
+
+    @Test
+    fun `get full crt output`() {
+        CRT.output(largerSample) shouldBe """
+            ##..##..##..##..##..##..##..##..##..##..
+            ###...###...###...###...###...###...###.
+            ####....####....####....####....####....
+            #####.....#####.....#####.....#####.....
+            ######......######......######......####
+            #######.......#######.......#######.....
+        """.trimIndent()
+    }
+
+    @Test
+    fun `part 2`() {
+        // PGHFGLUG
+        CRT.output(puzzle) shouldBe """
+            ###...##..#..#.####..##..#....#..#..##..
+            #..#.#..#.#..#.#....#..#.#....#..#.#..#.
+            #..#.#....####.###..#....#....#..#.#....
+            ###..#.##.#..#.#....#.##.#....#..#.#.##.
+            #....#..#.#..#.#....#..#.#....#..#.#..#.
+            #.....###.#..#.#.....###.####..##...###.
+        """.trimIndent()
     }
 }
