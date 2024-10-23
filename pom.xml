@@ -29,6 +29,11 @@
       <id>mavenCentral</id>
       <url>https://repo1.maven.org/maven2/</url>
     </repository>
+    <repository>
+      <id>maven_central</id>
+      <name>Maven Central</name>
+      <url>https://repo.maven.apache.org/maven2/</url>
+    </repository>
   </repositories>
 
   <build>
@@ -108,12 +113,12 @@
     <dependency>
       <groupId>org.jetbrains.kotlinx</groupId>
       <artifactId>kotlinx-coroutines-core-jvm</artifactId>
-      <version>1.7.3</version>
+      <version>1.8.1</version>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlinx</groupId>
       <artifactId>kotlinx-coroutines-core</artifactId>
-      <version>1.7.3</version>
+      <version>1.8.1</version>
     </dependency>
     <dependency>
       <groupId>com.natpryce</groupId>
