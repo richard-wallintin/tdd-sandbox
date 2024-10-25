@@ -1,20 +1,28 @@
 package y2022.day11
 
-typealias Item = Int
+import java.math.BigInteger
+
+typealias Item = BigInteger
 typealias Throw = Pair<Item, MonkeyNo>
 
 data class Monkey(
     val no: MonkeyNo,
     val items: List<Item>,
     val operation: (Item) -> Item,
-    val test: (Item) -> Boolean,
+    val test: Item,
     val ifTrue: MonkeyNo,
     val ifFalse: MonkeyNo,
-    val inspectedItemCount: Int = 0
+    val inspectedItemCount: Long = 0,
+    val relief: BigInteger = BigInteger.valueOf(3),
+    val optimization: BigInteger? = null
 ) {
+    fun test(item: Item) = item % test == BigInteger.ZERO
+
     fun turn(): List<Throw> {
         return items.map {
-            val afterInspection: Int = operation(it) / 3
+            var afterInspection = (operation(it) / relief)
+            if (optimization != null)
+                afterInspection %= optimization
             afterInspection to (if (test(afterInspection)) ifTrue else ifFalse)
         }
     }
@@ -40,4 +48,7 @@ data class Monkey(
     }
 
     private fun other(from: MonkeyNo) = from != no
+
+    fun worryMode() = copy(relief = BigInteger.ONE)
+    fun optimize(lcm: BigInteger) = copy(optimization = lcm)
 }

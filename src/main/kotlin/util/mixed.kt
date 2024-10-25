@@ -4,6 +4,10 @@ import java.math.BigInteger
 
 fun Int.power(exp: Int): Int = if (exp == 0) 1 else (this * this.power(exp - 1))
 
+val Iterable<Int>.big get() = map { BigInteger.valueOf(it.toLong()) }
+
+val Int.big: BigInteger get() = BigInteger.valueOf(toLong())
+
 fun String.split() = split(Regex("\\s+")).filter(String::isNotBlank)
 
 fun String.integers() = split().integers()
