@@ -1,6 +1,7 @@
 package y2024
 
 import util.integers
+import util.remove
 import kotlin.math.abs
 
 data class Report(val levels: List<Int>) {
@@ -28,5 +29,3 @@ data class Report(val levels: List<Int>) {
     }
 
 }
-
-private fun <E> List<E>.remove(idx: Int) = slice(0..<idx) + slice(idx + 1..lastIndex)

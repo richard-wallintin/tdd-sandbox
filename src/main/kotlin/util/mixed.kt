@@ -55,3 +55,5 @@ fun <K, V : Any> Sequence<Map<K, V>>.mergeMaps(remappingFunction: (V, V) -> V) =
         map.forEach { (k, v) -> acc.merge(k, v, remappingFunction) }
         acc
     }.toMap()
+
+fun <E> List<E>.remove(idx: Int) = slice(0..<idx) + slice(idx + 1..lastIndex)
