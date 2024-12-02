@@ -5,13 +5,19 @@ import kotlin.math.abs
 
 data class Report(val levels: List<Int>) {
     private val deltas = levels.zipWithNext { a, b -> b - a }
-
     val safe = (allIncreasing() || allDecreasing()) &&
             deltas.map(::abs).all { it <= 3 }
 
     private fun allDecreasing() = deltas.all { it < 0 }
 
     private fun allIncreasing() = deltas.all { it > 0 }
+
+    val dampenedSafe: Boolean by lazy {
+        val reports = sequenceOf(this) + levels.indices.asSequence().map {
+            Report(levels.remove(it))
+        }
+        reports.any { it.safe }
+    }
 
     companion object {
         fun parse(text: String): List<Report> {
@@ -22,3 +28,5 @@ data class Report(val levels: List<Int>) {
     }
 
 }
+
+private fun <E> List<E>.remove(idx: Int) = slice(0..<idx) + slice(idx + 1..lastIndex)

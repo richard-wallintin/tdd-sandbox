@@ -39,8 +39,20 @@ class ReportTest {
         Report(listOf(1, 3, 6, 7, 9)).safe shouldBe true
     }
 
+    private val inputReports = Report.parse(AOC.getInput("2024/day2.txt"))
+
     @Test
     fun part1() {
-        Report.parse(AOC.getInput("2024/day2.txt")).count { it.safe } shouldBe 369
+        inputReports.count { it.safe } shouldBe 369
+    }
+
+    @Test
+    fun dampenedSafety() {
+        sampleReports.count { it.dampenedSafe } shouldBe 4
+    }
+
+    @Test
+    fun part2() {
+        inputReports.count { it.dampenedSafe } shouldBe 428
     }
 }
