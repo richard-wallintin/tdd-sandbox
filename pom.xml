@@ -18,10 +18,10 @@
     <kotlin.compiler.jvmTarget>${java.level}</kotlin.compiler.jvmTarget>
     <maven.compiler.source>${java.level}</maven.compiler.source>
     <maven.compiler.target>${java.level}</maven.compiler.target>
-    <kotlin.version>1.8.20-RC</kotlin.version>
-    <junit.version>5.9.2</junit.version>
-    <lombok.version>1.18.30</lombok.version>
-    <cucumber-java.version>7.15.0</cucumber-java.version>
+    <kotlin.version>2.0.0</kotlin.version>
+    <junit.version>5.10.3</junit.version>
+    <lombok.version>1.18.34</lombok.version>
+    <cucumber-java.version>7.18.1</cucumber-java.version>
   </properties>
 
   <repositories>
@@ -175,13 +175,13 @@
     <dependency>
       <groupId>io.kotest</groupId>
       <artifactId>kotest-assertions-core-jvm</artifactId>
-      <version>5.8.0</version>
+      <version>5.9.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.mockk</groupId>
       <artifactId>mockk-jvm</artifactId>
-      <version>1.13.9</version>
+      <version>1.13.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -199,7 +199,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.9.0</version>
+      <version>5.11.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
