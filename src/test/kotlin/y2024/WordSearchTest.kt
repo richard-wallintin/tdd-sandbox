@@ -57,9 +57,21 @@ class WordSearchTest {
         sampleMatrixMedium.findXMASes() shouldBe 18
     }
 
+    private val inputMatrix = WordSearchMatrix.parse(AOC.getInput("/2024/day4.txt"))
+
     @Test
     fun part1() {
-        WordSearchMatrix.parse(AOC.getInput("/2024/day4.txt")).findXMASes() shouldBe 2583
+        inputMatrix.findXMASes() shouldBe 2583
+    }
+
+    @Test
+    fun `find all X-MASes`() {
+        sampleMatrixMedium.findAllCrossMASes() shouldBe 9
+    }
+
+    @Test
+    fun part2() {
+        inputMatrix.findAllCrossMASes() shouldBe 1978
     }
 }
 
@@ -96,6 +108,20 @@ class WordSearchMatrix(private val characters: List<List<Char>>) {
                     count++
                 }
             }
+        }
+        return count
+    }
+
+    fun findAllCrossMASes(): Int {
+        var count = 0
+        findAll('A').forEach { pointA ->
+            val pointMs = listOf(Point(1,1),Point(1,-1), Point(-1,-1), Point(-1,1)).count {
+                val pointM = pointA + it
+                val pointS = pointA - it
+                get(pointM) == 'M' && get(pointS) == 'S'
+            }
+
+            if(pointMs == 2) count++
         }
         return count
     }
