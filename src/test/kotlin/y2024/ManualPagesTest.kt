@@ -3,6 +3,7 @@ package y2024
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import y2024.Rule.Companion.adjust
 import y2024.Rule.Companion.filter
 import y2024.Rule.Companion.mustBeBefore
 import y2024.Update.Companion.middlePageSum
@@ -91,13 +92,37 @@ class ManualPagesTest {
         Rule.readValidUpdates(sampleInput).middlePageSum() shouldBe 143
     }
 
+    private val input = AOC.getInput("/2024/day5.txt")
+
     @Test
     fun part1() {
-        Rule.readValidUpdates(AOC.getInput("/2024/day5.txt")).middlePageSum() shouldBe 5713
+        Rule.readValidUpdates(input).middlePageSum() shouldBe 5713
+    }
+
+    @Test
+    fun `use rules to sort`() {
+        val sampleRules = Rule.parse(sampleInput)
+
+        sampleRules.adjust(Update(listOf(75, 97, 47, 61, 53))) shouldBe Update(
+            listOf(97, 75, 47, 61, 53)
+        )
+
+        sampleRules.adjust(Update(listOf(61, 13, 29))) shouldBe Update(
+            listOf(61, 29, 13)
+        )
+
+        sampleRules.adjust(Update(listOf(97, 13, 75, 29, 47))) shouldBe Update(
+            listOf(97, 75, 47, 29, 13)
+        )
+    }
+
+    @Test
+    fun `adjust batch`() {
+        Rule.adjustInvalidUpdates(sampleInput).middlePageSum() shouldBe 123
+    }
+
+    @Test
+    fun part2() {
+        Rule.adjustInvalidUpdates(input).middlePageSum() shouldBe 5180
     }
 }
-
-
-
-
-
