@@ -22,6 +22,11 @@ data class Rectangle(val a: Point, val c: Point) {
 
     operator fun contains(p: Point) = p.topLeftExclusive(c) && a.topLeft(p)
 
+    fun innerPoints() = (a.x..<c.x).asSequence().flatMap { x ->
+        (a.y..<c.y).asSequence().map { y -> Point(x, y) }
+    }
+
+
     val area by lazy { (c.x - a.x) * (c.y - a.y) }
 
     companion object {

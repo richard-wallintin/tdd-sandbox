@@ -8,7 +8,9 @@ data class LabMap(
     val guardDirection: CardinalDirection,
     val obstacles: Set<Point> = emptySet()
 ) {
-    val guardIsGone = guard !in Rectangle(Point(0, 0), size)
+    private val area = Rectangle(Point(0, 0), size)
+
+    val guardIsGone = guard !in area
 
     fun step(): LabMap {
         val ahead = guard.go(guardDirection)
@@ -17,12 +19,33 @@ data class LabMap(
         else copy(guard = ahead)
     }
 
-    fun steps() = forever { step() }
+    private fun steps() = forever { step() }
 
-    fun allGuardPositions() = steps()
-        .takeWhile { !it.guardIsGone }
+    fun allGuardPositions() = guardPositions().toSet()
+
+    private fun guardPositions() = stepsUntilGuardLeaves()
         .map { it.guard }
-        .toSet()
+
+    private fun stepsUntilGuardLeaves() = steps()
+        .takeWhile { !it.guardIsGone }
+
+    fun obstruct(point: Point) = copy(obstacles = obstacles + point)
+
+    val loops: Boolean by lazy {
+        val visited = mutableSetOf<Pair<Point, CardinalDirection>>()
+        stepsUntilGuardLeaves().forEach {
+            val firstTime = visited.add(it.guard to it.guardDirection)
+            if (!firstTime) return@lazy true
+        }
+        false
+    }
+
+    val loopingVariations: Int by lazy {
+        area.innerPoints()
+            .filter { it != guard }
+            .filter { it !in obstacles }
+            .count { obstruct(it).loops }
+    }
 
     companion object {
         fun parse(text: String): LabMap {
@@ -43,7 +66,7 @@ data class LabMap(
                 chars.size,
                 guardPositionAndChar.first,
                 guardDirection,
-                chars.findAll('#').map { it.first }.toSet()
+                chars.findAll('#', 'O').map { it.first }.toSet()
             )
         }
     }

@@ -1,6 +1,7 @@
 package y2024.day6
 
 import AOC
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import util.CardinalDirection
@@ -58,8 +59,45 @@ class LabGuardTest {
         allPositions.size shouldBe 41
     }
 
+    private val inputMap = LabMap.parse(AOC.getInput("/2024/day6.txt"))
+
     @Test
     fun part1() {
-        LabMap.parse(AOC.getInput("/2024/day6.txt")).allGuardPositions().size shouldBe 5404
+        inputMap.allGuardPositions().size shouldBe 5404
+    }
+
+    @Test
+    fun `detect loop`() {
+        val loopMap = LabMap.parse(
+            """
+            ....#.....
+            ....+---+#
+            ....|...|.
+            ..#.|...|.
+            ....|..#|.
+            ....|...|.
+            .#.O^---+.
+            ........#.
+            #.........
+            ......#...
+        """.trimIndent()
+        )
+
+        loopMap.loops shouldBe true
+    }
+
+    @Test
+    fun `add obstruction to the lab`() {
+        sampleMap.obstruct(Point(0, 0)).obstacles shouldContain Point(0, 0)
+    }
+
+    @Test
+    fun `detect all looping variations`() {
+        sampleMap.loopingVariations shouldBe 6
+    }
+
+    @Test
+    fun part2() {
+        inputMap.loopingVariations shouldBe 1984
     }
 }
