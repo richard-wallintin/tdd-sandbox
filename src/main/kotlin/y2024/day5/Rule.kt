@@ -1,4 +1,4 @@
-package y2024
+package y2024.day5
 
 import util.integers
 

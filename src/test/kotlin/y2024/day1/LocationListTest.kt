@@ -1,4 +1,4 @@
-package y2024
+package y2024.day1
 
 import AOC
 import io.kotest.matchers.shouldBe

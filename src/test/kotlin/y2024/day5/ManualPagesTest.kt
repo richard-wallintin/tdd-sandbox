@@ -1,12 +1,12 @@
-package y2024
+package y2024.day5
 
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import y2024.Rule.Companion.adjust
-import y2024.Rule.Companion.filter
-import y2024.Rule.Companion.mustBeBefore
-import y2024.Update.Companion.middlePageSum
+import y2024.day5.Rule.Companion.adjust
+import y2024.day5.Rule.Companion.filter
+import y2024.day5.Rule.Companion.mustBeBefore
+import y2024.day5.Update.Companion.middlePageSum
 
 class ManualPagesTest {
 

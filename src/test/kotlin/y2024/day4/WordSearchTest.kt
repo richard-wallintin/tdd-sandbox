@@ -1,4 +1,4 @@
-package y2024
+package y2024.day4
 
 import AOC
 import io.kotest.matchers.shouldBe
@@ -18,7 +18,8 @@ class WordSearchTest {
             """.trimIndent()
     )
 
-    private val sampleMatrixMedium = WordSearchMatrix.parse("""
+    private val sampleMatrixMedium = WordSearchMatrix.parse(
+        """
         MMMSXXMASM
         MSAMXMSMSA
         AMXSXMAAMM
@@ -29,7 +30,8 @@ class WordSearchTest {
         SAXAMASAAA
         MAMMMXMMMM
         MXMXAXMASX
-    """.trimIndent())
+    """.trimIndent()
+    )
 
     @Test
     fun `create a word search matrix`() {

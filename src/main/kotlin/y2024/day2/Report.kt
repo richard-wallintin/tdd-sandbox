@@ -1,4 +1,4 @@
-package y2024
+package y2024.day2
 
 import util.integers
 import util.remove
