@@ -4,7 +4,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 data class Rectangle(val a: Point, val c: Point) {
-
     init {
         assert(a.topLeft(c)) { "a=$a must be ≤ c=$c" }
     }
@@ -20,6 +19,8 @@ data class Rectangle(val a: Point, val c: Point) {
         )
         return if (newA.topLeft(newC)) Rectangle(newA, newC) else null
     }
+
+    operator fun contains(p: Point) = p.topLeftExclusive(c) && a.topLeft(p)
 
     val area by lazy { (c.x - a.x) * (c.y - a.y) }
 

@@ -54,6 +54,7 @@ data class Point(val x: Long, val y: Long) : Comparable<Point> {
     fun mod(r: Point) = Point(x.mod(r.x), y.mod(r.y))
 
     fun topLeft(o: Point) = x <= o.x && y <= o.y
+    fun topLeftExclusive(o: Point) = x < o.x && y < o.y
 
     fun abs() = copy(x = abs(x), y = abs(y))
 }

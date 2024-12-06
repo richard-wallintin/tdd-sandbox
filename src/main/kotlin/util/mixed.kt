@@ -57,3 +57,12 @@ fun <K, V : Any> Sequence<Map<K, V>>.mergeMaps(remappingFunction: (V, V) -> V) =
     }.toMap()
 
 fun <E> List<E>.remove(idx: Int) = slice(0..<idx) + slice(idx + 1..lastIndex)
+
+fun <T> T.repeat(times: Int, op: T.() -> T) = (1..times).fold(this) { x, _ -> x.op() }
+fun <T> T.forever(op: T.() -> T) = sequence {
+    var x = this@forever
+    while (true) {
+        yield(x)
+        x = x.op()
+    }
+}
