@@ -41,7 +41,7 @@ data class LabMap(
     }
 
     val loopingVariations: Int by lazy {
-        area.innerPoints()
+        stepsUntilGuardLeaves().map { it.guard }.toSet()
             .filter { it != guard }
             .filter { it !in obstacles }
             .count { obstruct(it).loops }
