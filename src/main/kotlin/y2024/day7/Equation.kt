@@ -7,17 +7,22 @@ data class Equation(
     val result: Long
 ) {
     fun solutions(concat: Boolean = false) =
-        results(operands.reversed(), concat).count { it == result }
+        results(operands.first(), operands.drop(1), concat).count { it == result }
 
-    private fun results(head: List<Long>, concat: Boolean = false): Sequence<Long> = sequence {
-        val right = head.firstOrNull() ?: return@sequence
-        val left = head.drop(1)
-        if (left.isEmpty()) yield(right)
-        else results(left, concat).forEach { leftResult ->
-            yield(right + leftResult)
-            yield(right * leftResult)
-            if (concat) yield((leftResult.toString() + right.toString()).toLong())
-        }
+    private fun results(left: Long, tail: List<Long>, concat: Boolean): Sequence<Long> {
+        if (tail.isEmpty()) return sequenceOf(left)
+
+        val right = tail.first()
+        val remainder = tail.drop(1)
+
+        return results(left + right, remainder, concat) +
+                results(left * right, remainder, concat) +
+                if (concat)
+                    results(
+                        (left.toString() + right.toString()).toLong(),
+                        remainder,
+                        true
+                    ) else emptySequence()
     }
 
     companion object {
