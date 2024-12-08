@@ -40,15 +40,17 @@ class AntinodeTest {
     @Test
     fun `compute antinode locations for antenna pair`() {
         Antenna(Point(5, 2), '0').antinodes(
-            Antenna(Point(7, 3), '0')
-        ) shouldBe setOf(Point(9, 4), Point(3, 1))
+            Antenna(Point(7, 3), '0'),
+            sampleMap.boundary
+        ) shouldBe listOf(Point(9, 4), Point(3, 1))
     }
 
     @Test
     fun `antennas with different frequencies hace no antinodes`() {
         Antenna(Point(4, 4), '0').antinodes(
-            Antenna(Point(6, 5), 'A')
-        ) shouldBe emptySet()
+            Antenna(Point(6, 5), 'A'),
+            sampleMap.boundary
+        ) shouldBe emptyList()
     }
 
     @Test
@@ -56,8 +58,20 @@ class AntinodeTest {
         sampleMap.antinodeCount shouldBe 14
     }
 
+    private val inputMap = AntennaMap.parse(AOC.getInput("/2024/day8.txt"))
+
     @Test
     fun part1() {
-        AntennaMap.parse(AOC.getInput("/2024/day8.txt")).antinodeCount shouldBe 359
+        inputMap.antinodeCount shouldBe 359
+    }
+
+    @Test
+    fun `antnodeCount with enhanced formula`() {
+        sampleMap.enhanced().antinodeCount shouldBe 34
+    }
+
+    @Test
+    fun part2() {
+        inputMap.enhanced().antinodeCount shouldBe 1293
     }
 }
