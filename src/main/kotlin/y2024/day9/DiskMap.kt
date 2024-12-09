@@ -52,15 +52,20 @@ data class DiskMap(val blocks: List<Block>) {
     fun compact(): DiskMap {
         val blocks = blocks.toMutableList()
 
-        while (true) {
-            val free = blocks.indexOfFirst { it is FreeBlock }
-            val file = blocks.indexOfLast { it is FileBlock }
-            check(file >= 0)
-            if (free < file)
-                blocks.swap(free, file)
-            else
-                return copy(blocks = blocks.toList())
+        var fileBlockIndex = blocks.size - 1
+        while (fileBlockIndex > 0) {
+            val file = blocks[fileBlockIndex]
+            if (file is FileBlock) {
+                val free = blocks.indexOfFirst { it is FreeBlock }
+                if (free < fileBlockIndex)
+                    blocks.swap(free, fileBlockIndex)
+                else {
+                    break
+                }
+            }
+            fileBlockIndex--
         }
+        return copy(blocks = blocks.toList())
     }
 
     fun spans() = sequence {
