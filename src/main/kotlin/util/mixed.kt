@@ -58,6 +58,8 @@ fun <K, V : Any> Sequence<Map<K, V>>.mergeMaps(remappingFunction: (V, V) -> V) =
 
 fun <E> List<E>.remove(idx: Int) = slice(0..<idx) + slice(idx + 1..lastIndex)
 
+fun <T> Int.times(o: T) = (1..this).map { o }
+
 fun <T> T.repeat(times: Int, op: T.() -> T) = (1..times).fold(this) { x, _ -> x.op() }
 fun <T> T.forever(op: T.() -> T) = sequence {
     var x = this@forever
@@ -65,4 +67,12 @@ fun <T> T.forever(op: T.() -> T) = sequence {
         yield(x)
         x = x.op()
     }
+}
+
+fun <E> MutableList<E>.swap(a: Int, b: Int) {
+    require(a < b)
+    val valueA = removeAt(a)
+    val valueB = removeAt(b-1)
+    add(a, valueB)
+    add(b, valueA)
 }
