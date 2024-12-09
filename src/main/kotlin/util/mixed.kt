@@ -72,7 +72,13 @@ fun <T> T.forever(op: T.() -> T) = sequence {
 fun <E> MutableList<E>.swap(a: Int, b: Int) {
     require(a < b)
     val valueA = removeAt(a)
-    val valueB = removeAt(b-1)
+    val valueB = removeAt(b - 1)
     add(a, valueB)
     add(b, valueA)
+}
+
+fun <E> MutableList<E>.replace(idx: Int, v: E): E {
+    val oldValue = removeAt(idx)
+    add(idx, v)
+    return oldValue
 }
