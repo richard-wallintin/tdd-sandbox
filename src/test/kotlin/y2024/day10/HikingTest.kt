@@ -50,25 +50,39 @@ class HikingTest {
         smallSampleMap.score(trailhead = Point(0, 0)) shouldBe 1
     }
 
+    private val mediumSampleMap = IslandMap.parse(
+        """
+                89010123
+                78121874
+                87430965
+                96549874
+                45678903
+                32019012
+                01329801
+                10456732
+            """.trimIndent()
+    )
+
     @Test
     fun `all trailhead scores`() {
-        IslandMap.parse(
-            """
-            89010123
-            78121874
-            87430965
-            96549874
-            45678903
-            32019012
-            01329801
-            10456732
-        """.trimIndent()
-        ).totalScore() shouldBe 36
+        mediumSampleMap.totalScore() shouldBe 36
     }
+
+    private val inputMap = IslandMap.parse(AOC.getInput("/2024/day10.txt"))
 
     @Test
     fun part1() {
-        IslandMap.parse(AOC.getInput("/2024/day10.txt")).totalScore() shouldBe 42
+        inputMap.totalScore() shouldBe 798
+    }
+
+    @Test
+    fun rating() {
+        mediumSampleMap.totalRating() shouldBe 81
+    }
+
+    @Test
+    fun part2() {
+        inputMap.totalRating() shouldBe 1816
     }
 }
 
@@ -101,8 +115,10 @@ data class IslandMap(private val grid: Grid<Int>) {
     }
 
     fun score(trailhead: Point) = trailsToTop(trailhead).map { it.end }.toSet().size
+    fun rating(trailhead: Point) = trailsToTop(trailhead).count()
 
     fun totalScore() = starts.map(::score).sum()
+    fun totalRating() = starts.map(::rating).sum()
 
 
     val starts: Set<Point> = grid.findAll(0).map { it.first }.toSet()
