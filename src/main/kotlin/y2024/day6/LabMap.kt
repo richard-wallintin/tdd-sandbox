@@ -49,7 +49,7 @@ data class LabMap(
 
     companion object {
         fun parse(text: String): LabMap {
-            return of(Grid(text.lines().map { it.toList() }))
+            return of(Grid.charGridOf(text))
         }
 
         fun of(chars: Grid<Char>): LabMap {

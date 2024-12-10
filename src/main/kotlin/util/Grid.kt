@@ -20,4 +20,10 @@ data class Grid<T>(private val grid: List<List<T>>) {
     fun findAllNearby(predicate: (T) -> Boolean, point: Point): List<Point> {
         return point.env().filter { get(it)?.let(predicate) ?: false }.toList()
     }
+
+    fun <R> map(transform: (T) -> R) = Grid(grid = grid.map { it.map(transform) })
+
+    companion object {
+        fun charGridOf(text: String) = text.lines().map(String::toList).let(::Grid)
+    }
 }
