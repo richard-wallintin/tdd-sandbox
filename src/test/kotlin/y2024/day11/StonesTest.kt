@@ -1,12 +1,13 @@
 package y2024.day11
 
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import util.longs
 import util.repeat
 import y2024.day11.Stone.Companion.blink
+import y2024.day11.Stone.Companion.countStones
 import y2024.day11.Stone.Companion.parseArrangement
+import y2024.day11.Stone.Companion.predictStones
 import y2024.day11.Stone.Companion.render
 
 class StonesTest {
@@ -37,7 +38,7 @@ class StonesTest {
         Stone(999).blink() shouldBe listOf(Stone(2021976))
     }
 
-    private val sampleArrangement = Stone.parseArrangement("0 1 10 99 999")
+    private val sampleArrangement = parseArrangement("0 1 10 99 999")
 
     @Test
     fun `one blink sample`() {
@@ -51,19 +52,25 @@ class StonesTest {
         sampleArrangement2.repeat(6) { blink() }
             .render() shouldBe "2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2"
 
-        sampleArrangement2.repeat(25) { blink() }.size shouldBe 55312
+        sampleArrangement2.countStones(25) shouldBe 55312
     }
 
-    private val inputArranegement = parseArrangement("70949 6183 4 3825336 613971 0 15 182")
+    private val inputArrangement = parseArrangement("70949 6183 4 3825336 613971 0 15 182")
 
     @Test
     fun part1() {
-        inputArranegement.repeat(25) { blink() }.size shouldBe 185205
+        inputArrangement.countStones(25) shouldBe 185205
     }
 
-    @Test @Disabled
+    @Test
+    fun `predict stone count`() {
+        sampleArrangement.predictStones(1) shouldBe 7
+        sampleArrangement2.predictStones(25) shouldBe 55312
+    }
+
+    @Test
     fun part2() {
-        inputArranegement.repeat(75){blink()}.size shouldBe 42
+        inputArrangement.predictStones(75) shouldBe 221280540398419L
     }
 }
 
@@ -85,12 +92,27 @@ data class Stone(val engraved: Long) {
         }
     }
 
+    fun predictStones(blinks: Int): Long {
+        return if (blinks == 0) 1 else {
+            val key = engraved to blinks
+            cache[key] ?: blink().sumOf {
+                it.predictStones(blinks - 1)
+            }.also { cache[key] = it }
+        }
+    }
+
     companion object {
         fun parseArrangement(line: String) = line.longs().map { Stone(it) }
         fun Arrangement.blink() = flatMap { it.blink() }
         fun Arrangement.render() = joinToString(" ") {
             it.engraved.toString()
         }
+
+        fun Arrangement.countStones(blinks: Int) = repeat(blinks) { blink() }.size
+
+        private val cache = mutableMapOf<Pair<Long, Int>, Long>()
+
+        fun Arrangement.predictStones(blinks: Int) = this.sumOf { it.predictStones(blinks) }
     }
 
 }
