@@ -57,4 +57,18 @@ data class Point(val x: Long, val y: Long) : Comparable<Point> {
     fun topLeftExclusive(o: Point) = x < o.x && y < o.y
 
     fun abs() = copy(x = abs(x), y = abs(y))
+    fun cardinalEnv() = CardinalDirection.entries.map { go(it) }
+
+    fun traverse(
+        next: (Point) -> Iterable<Point> = Point::cardinalEnv,
+        seen: MutableSet<Point> = mutableSetOf(this),
+        filter: (Point) -> Boolean,
+    ): Sequence<Point> = sequenceOf(this) +
+            next(this).asSequence().filter(filter).filter { seen.add(it) }.flatMap {
+                it.traverse(next, seen, filter)
+            }
+
+    companion object {
+        infix fun Int.by(y: Int) = Point(this, y)
+    }
 }

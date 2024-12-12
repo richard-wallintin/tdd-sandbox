@@ -1,7 +1,10 @@
 package util
 
+import util.Rectangle.Companion.asExtent
+
 data class Grid<T>(private val grid: List<List<T>>) {
     val size: Point = Point(grid.maxOf { it.size }, grid.size)
+    val extent = size.asExtent
 
     operator fun get(p: Point) = get(p.int.x, p.int.y)
     operator fun get(x: Int, y: Int): T? {

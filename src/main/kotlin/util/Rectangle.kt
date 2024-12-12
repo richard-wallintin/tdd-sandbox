@@ -40,5 +40,7 @@ data class Rectangle(val a: Point, val c: Point) {
         private fun min(m: Point, n: Point) = Point(min(m.x, n.x), min(m.y, n.y))
 
         fun Rectangle?.effectiveArea(): Long = this?.area ?: 0
+
+        val Point.asExtent get() = Rectangle(Point(0,0), this.abs())
     }
 }
