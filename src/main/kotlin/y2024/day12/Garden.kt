@@ -5,6 +5,7 @@ import util.Grid
 data class Garden(val regions: Set<Region> = emptySet()) {
 
     val totalPrice: Int by lazy { regions.sumOf { it.price } }
+    val totalDiscountedPrice: Int by lazy { regions.sumOf { it.discountedPrice }}
 
     companion object {
         fun parse(text: String) = of(Grid.charGridOf(text))

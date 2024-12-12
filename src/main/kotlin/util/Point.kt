@@ -39,6 +39,12 @@ data class Point(val x: Long, val y: Long) : Comparable<Point> {
         }
     }
 
+    fun horizontalNeighbour(b: Point) =
+        y == b.y && abs(x - b.x) == 1L
+
+    fun verticalNeighbour(b: Point) =
+        x == b.x && abs(y - b.y) == 1L
+
     operator fun plus(o: Point) = copy(x = x + o.x, y = y + o.y)
     operator fun plus(distance: Long) = copy(x = x + distance, y = y + distance)
     operator fun minus(o: Point) = copy(x = x - o.x, y = y - o.y)

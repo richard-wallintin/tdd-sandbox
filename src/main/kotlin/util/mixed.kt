@@ -84,3 +84,25 @@ fun <E> MutableList<E>.replace(idx: Int, v: E): E {
     add(idx, v)
     return oldValue
 }
+
+fun <T> Set<T>.groupMatches(match: (T, T) -> Boolean): Set<Set<T>> {
+    val unassigned = this.toMutableSet()
+    val groups = mutableSetOf<Set<T>>()
+    while (unassigned.isNotEmpty()) {
+        val x = unassigned.first().also { unassigned.remove(it) }
+        val group = mutableSetOf(x)
+
+        do {
+            val foundMatch = unassigned.find { candidate ->
+                group.any { match(candidate, it) }
+            }?.let {
+                unassigned.remove(it)
+                group.add(it)
+                true
+            } ?: false
+        } while (foundMatch)
+
+        groups.add(group)
+    }
+    return groups
+}
