@@ -1,11 +1,11 @@
 package y2024.day13
 
 import AOC
-import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import util.Point
 import util.Point.Companion.by
+import util.big
 
 class ClawMachineTest {
 
@@ -35,19 +35,15 @@ class ClawMachineTest {
     //Prize: X=7870, Y=6450
     private val machine3 = ClawMachine(buttonA = 17 by 86, buttonB = 84 by 37, prize = 7870 by 6450)
 
-    private val machineX = ClawMachine(buttonA = 10 by 10, buttonB = 1 by 1, prize = 50 by 50)
-
     @Test
     fun `compute all combinations towards prize`() {
-        machine1.whichMovesToWin().toList() shouldBe listOf(Pair(80, 40))
+        machine1.whichMovesToWin().toList() shouldBe listOf(Pair(80L, 40L))
         machine2.whichMovesToWin().toList() shouldBe emptyList()
-        machine3.whichMovesToWin().toList() shouldBe listOf(38 to 86)
-        machineX.whichMovesToWin().toList() shouldContain (5 to 0)
+        machine3.whichMovesToWin().toList() shouldBe listOf(38L to 86L)
     }
 
     @Test
     fun `find cheapest moves`() {
-        machineX.cheapestSolutionCosts shouldBe 15
         machine1.cheapestSolutionCosts shouldBe 280
         machine2.cheapestSolutionCosts shouldBe 0
     }
@@ -67,34 +63,64 @@ class ClawMachineTest {
         ) shouldBe listOf(machine1, machine2)
     }
 
+    private val inputMachines = ClawMachine.parseMany(AOC.getInput("/2024/day13.txt"))
+
     @Test
     fun part1() {
-        ClawMachine.parseMany(AOC.getInput("/2024/day13.txt")).sumOf {
+        inputMachines.sumOf {
             it.cheapestSolutionCosts
         } shouldBe 32067
+    }
+
+    @Test
+    fun `directly compute solution`() {
+        machine1.estimateMovesToWin() shouldBe Pair(80L, 40L)
+        machine2.estimateMovesToWin() shouldBe Pair(141L, 135L)
+
+        machine1.computeMovesToWin() shouldBe Pair(80L, 40L)
+        machine2.computeMovesToWin() shouldBe null
+    }
+
+    @Test
+    fun part2() {
+        inputMachines.map { it.increasePrizePosition() }
+            .sumOf { it.cheapestSolutionCosts } shouldBe 92871736253789L
     }
 }
 
 data class ClawMachine(val buttonA: Point, val buttonB: Point, val prize: Point) {
-    val cheapestSolutionCosts: Int by lazy {
-        whichMovesToWin().map { (a, b) -> a * 3 + b * 1 }.minOrNull() ?: 0
+    val cheapestSolutionCosts: Long by lazy {
+        computeMovesToWin()?.let { (a, b) -> a * 3 + b * 1 } ?: 0
     }
 
-    fun whereAmI(movesA: Int, movesB: Int): Point {
+    fun whereAmI(movesA: Long, movesB: Long): Point {
         return Point(
             buttonA.x * movesA + buttonB.x * movesB,
             buttonA.y * movesA + buttonB.y * movesB
         )
     }
 
-    fun whichMovesToWin(): Sequence<Pair<Int, Int>> = sequence {
-        (0..100).forEach { movesA ->
-            (0..100).forEach { movesB ->
+    fun whichMovesToWin(): Sequence<Pair<Long, Long>> = sequence {
+        (0L..100L).forEach { movesA ->
+            (0L..100L).forEach { movesB ->
                 if (whereAmI(movesA, movesB) == prize)
                     yield(movesA to movesB)
             }
         }
     }
+
+    fun estimateMovesToWin(): Pair<Long, Long> {
+        val d = (buttonA.x * buttonB.y - buttonA.y * buttonB.x).big
+        val movesA = ((buttonB.y.big * prize.x.big) + (-buttonB.x.big * prize.y.big)) / d
+        val movesB = ((-buttonA.y.big * prize.x.big) + (buttonA.x.big * prize.y.big)) / d
+        return movesA.toLong() to movesB.toLong()
+    }
+
+    fun computeMovesToWin() = estimateMovesToWin().takeIf { (a, b) ->
+        whereAmI(a, b) == prize
+    }
+
+    fun increasePrizePosition() = copy(prize = prize.plus(10000000000000L))
 
     companion object {
         fun parseMany(text: String): List<ClawMachine> {
