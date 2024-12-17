@@ -76,5 +76,6 @@ data class Point(val x: Long, val y: Long) : Comparable<Point> {
 
     companion object {
         infix fun Int.by(y: Int) = Point(this, y)
+        infix fun Long.by(y: Long) = Point(this, y)
     }
 }
