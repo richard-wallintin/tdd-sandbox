@@ -107,3 +107,6 @@ fun <T> Set<T>.groupMatches(match: (T, T) -> Boolean): Set<Set<T>> {
     }
     return groups
 }
+
+fun <E> List<E>.replace(i: Int, transform: (E) -> E) =
+    mapIndexed { index, e -> if (index == i) transform(e) else e }

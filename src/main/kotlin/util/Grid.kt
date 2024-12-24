@@ -11,6 +11,14 @@ data class Grid<T>(private val grid: List<List<T>>) {
         return grid.getOrNull(y)?.getOrNull(x)
     }
 
+    operator fun plus(cell: Pair<Point, T>) = copy(
+        grid = grid.replace(cell.first.int.y) { row -> row.replace(cell.first.int.x) { cell.second } }
+    )
+
+    // maybe be implemented more efficiently
+    operator fun plus(map: Map<Point, T>) =
+        map.asSequence().fold(this) { g, e -> g + (e.key to e.value) }
+
     fun findAll(vararg v: T) = findAll { it in v }
 
     fun findAll(predicate: (T) -> Boolean) = grid.flatMapIndexed { y, row ->
@@ -26,7 +34,14 @@ data class Grid<T>(private val grid: List<List<T>>) {
 
     fun <R> map(transform: (T) -> R) = Grid(grid = grid.map { it.map(transform) })
 
+
     companion object {
         fun charGridOf(text: String) = text.lines().map(String::toList).let(::Grid)
+
+        fun Grid<Char>.asText(): String {
+            return grid.joinToString("\n") { row ->
+                row.joinToString("")
+            }
+        }
     }
 }

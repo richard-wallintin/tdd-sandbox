@@ -46,10 +46,10 @@ enum class CardinalDirection(val x: Int, val y: Int) {
     companion object {
         fun of(s: String): CardinalDirection {
             return when (s) {
-                "N", "U" -> N
-                "W", "L" -> W
-                "S", "D" -> S
-                "E", "R" -> E
+                "^", "N", "U" -> N
+                "<", "W", "L" -> W
+                "v", "S", "D" -> S
+                ">", "E", "R" -> E
                 else -> throw IllegalArgumentException("unknown direction $s")
             }
         }
