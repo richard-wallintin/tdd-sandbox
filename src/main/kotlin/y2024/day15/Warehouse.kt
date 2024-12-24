@@ -9,7 +9,9 @@ data class Warehouse(
     val grid: Grid<Tile>
 ) {
     val robot: Point = grid.findAll(Robot).first().first
-    val boxes: Set<Point> by lazy { grid.findAll(Box).map { it.first }.toSet() }
+    val boxes: Set<Point> by lazy {
+        grid.findAll { it is SmallBox || it is BoxL }.map { it.first }.toSet()
+    }
     val sumOfGPS: Long by lazy {
         boxes.sumOf { (x, y) ->
             x + 100 * y
@@ -33,15 +35,40 @@ data class Warehouse(
         from: Point,
         direction: CardinalDirection
     ): Map<Point, Tile> {
+        return if (thing is HalfBox && direction.vertical) {
+            val l = if (thing is BoxL) from else from.go(CardinalDirection.W)
+            val r = if (thing is BoxR) from else from.go(CardinalDirection.E)
+
+            val tryLeft = tryToPush(BoxL, l, direction)
+            val tryRight = tryToPush(BoxR, r, direction)
+
+            if (tryLeft.isEmpty() || tryRight.isEmpty()) emptyMap()
+            else {
+                val freeSpots =
+                    (tryLeft.filterValues { it is Empty }) + (tryRight.filterValues { it is Empty })
+                val occupiedSpots =
+                    (tryLeft.filterValues { it !is Empty }) + (tryRight.filterValues { it !is Empty })
+                freeSpots + occupiedSpots
+            }
+        } else
+            tryToPush(thing, from, direction)
+
+    }
+
+    private fun tryToPush(
+        thing: Movable,
+        from: Point,
+        direction: CardinalDirection
+    ): Map<Point, Tile> {
         val to = from.go(direction)
-        return when {
-            grid[to] == Box -> {
-                val moves = tryMove(Box, to, direction)
-                if (moves.isEmpty()) return emptyMap()
+        return when (val other = grid[to]) {
+            is Box -> {
+                val moves = tryMove(other, to, direction)
+                if (moves.isEmpty()) emptyMap()
                 else moves + mapOf(from to Empty, to to thing)
             }
 
-            grid[to] == Empty -> mapOf(from to Empty, to to thing)
+            Empty -> mapOf(from to Empty, to to thing)
             else -> emptyMap()
         }
     }
@@ -51,10 +78,23 @@ data class Warehouse(
             when (it) {
                 Robot -> '@'
                 Empty -> '.'
-                Box -> 'O'
+                SmallBox -> 'O'
+                BoxL -> '['
+                BoxR -> ']'
                 Wall -> '#'
             }
         }.asText()
+    }
+
+    fun scaleUp(): Warehouse {
+        return copy(grid = grid.flatMap {
+            when (it) {
+                Wall -> listOf(Wall, Wall)
+                is Box -> listOf(BoxL, BoxR)
+                Empty -> listOf(Empty, Empty)
+                Robot -> listOf(Robot, Empty)
+            }
+        })
     }
 
 
@@ -64,7 +104,9 @@ data class Warehouse(
                 when (it) {
                     '@' -> Robot
                     '#' -> Wall
-                    'O' -> Box
+                    'O' -> SmallBox
+                    '[' -> BoxL
+                    ']' -> BoxR
                     else -> Empty
                 }
             }
@@ -77,12 +119,16 @@ data class Warehouse(
             .filter { !it.isWhitespace() }
             .map { CardinalDirection.of(it.toString()) }
 
-        fun execute(wareHouseAndDirections: String): Warehouse {
-            val wareHouseText = wareHouseAndDirections.lineSequence().takeWhile { it.isNotBlank() }
+        fun execute(scaled: Boolean = false, mapAndDirections: String): Warehouse {
+            val wareHouseText = mapAndDirections.lineSequence().takeWhile { it.isNotBlank() }
                 .joinToString("\n")
-            val warehouse = parse(wareHouseText)
+
+            val warehouse = parse(wareHouseText).let {
+                if (scaled) it.scaleUp() else it
+            }
+
             val directionsText =
-                wareHouseAndDirections.lineSequence().dropWhile { it.isNotBlank() }.drop(1)
+                mapAndDirections.lineSequence().dropWhile { it.isNotBlank() }.drop(1)
                     .joinToString("")
             val directions = directions(directionsText)
             return warehouse.moveRobot(directions)
@@ -92,8 +138,13 @@ data class Warehouse(
     sealed interface Tile
     sealed interface Movable : Tile
     data object Robot : Movable
-    data object Box : Movable
+
+    sealed interface Box : Movable
+    data object SmallBox : Box
+    sealed interface HalfBox : Box
+    data object BoxL : HalfBox
+    data object BoxR : HalfBox
+
     data object Wall : Tile
     data object Empty : Tile
-
 }

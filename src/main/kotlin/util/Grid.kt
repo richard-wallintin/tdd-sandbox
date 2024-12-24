@@ -33,7 +33,7 @@ data class Grid<T>(private val grid: List<List<T>>) {
     }
 
     fun <R> map(transform: (T) -> R) = Grid(grid = grid.map { it.map(transform) })
-
+    fun <R> flatMap(transform: (T) -> Iterable<R>) = Grid(grid = grid.map { it.flatMap(transform) })
 
     companion object {
         fun charGridOf(text: String) = text.lines().map(String::toList).let(::Grid)

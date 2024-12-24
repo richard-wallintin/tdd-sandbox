@@ -16,6 +16,7 @@ enum class CardinalDirection(val x: Int, val y: Int) {
         else -> RelativeDirection.AHEAD
     }
 
+    val vertical: Boolean get() = (this == N) || (this == S)
     val inverse: CardinalDirection by lazy {
         when (this) {
             N -> S

@@ -135,6 +135,111 @@ class WarehouseTest {
     @Test
     fun `larger example`() {
         Warehouse.execute(
+            mapAndDirections = """
+                        ##########
+                        #..O..O.O#
+                        #......O.#
+                        #.OO..O.O#
+                        #..O@..O.#
+                        #O#..O...#
+                        #O..O..O.#
+                        #.OO.O.OO#
+                        #....O...#
+                        ##########
+                        
+                        <vv>^<v^>v>^vv^v>v<>v^v<v<^vv<<<^><<><>>v<vvv<>^v^>^<<<><<v<<<v^vv^v>^
+                        vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v
+                        ><>vv>v^v^<>><>>>><^^>vv>v<^^^>>v^v^<^^>v^^>v^<^v>v<>>v^v^<v>v^^<^^vv<
+                        <<v<^>>^^^^>>>v^<>vvv^><v<<<>^^^vv^<vvv>^>v<^^^^v<>^>vvvv><>>v^<<^^^^^
+                        ^><^><>>><>^^<<^^v>>><^<v>^<vv>>v>>>^v><>^v><<<<v>>v<v<v>vvv>^<><<>^><
+                        ^>><>^v<><^vvv<^^<><v<<<<<><^v<<<><<<^^<v<^^^><^>>^<v^><<<^>>^v<v^v<v^
+                        >^>>^v>vv>^<<^v<>><<><<v<<v><>v<^vv<<<>^^v^>^^>>><<^v>>v^v><^^>>^<>vv^
+                        <><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>
+                        ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
+                        v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
+                    """.trimIndent()
+        ) shouldBe largeExampleResult
+    }
+
+    @Test
+    fun `gps sum`() {
+        largeExampleResult.sumOfGPS shouldBe 10092
+        smallSampleResult.sumOfGPS shouldBe 2028
+    }
+
+    private val input = AOC.getInput("/2024/day15.txt")
+
+    @Test
+    fun part1() {
+        Warehouse.execute(mapAndDirections = input).sumOfGPS shouldBe 1429911L
+    }
+
+    private val smallSampleScaled = Warehouse.parse(
+        """
+                #######
+                #...#.#
+                #.....#
+                #..OO@#
+                #..O..#
+                #.....#
+                #######
+            """.trimIndent()
+    ).scaleUp()
+
+    @Test
+    fun `parse and scale`() {
+        smallSampleScaled.toString() shouldBe """
+            ##############
+            ##......##..##
+            ##..........##
+            ##....[][]@.##
+            ##....[]....##
+            ##..........##
+            ##############
+        """.trimIndent()
+    }
+
+    @Test
+    fun `correct box count`() {
+        smallSampleScaled.boxes shouldBe setOf(
+            Point(6, 3),
+            Point(6, 4),
+            Point(8, 3),
+        )
+    }
+
+    @Test
+    fun `execute moves`() {
+        smallSampleScaled.moveRobot(Warehouse.directions("<vv<<^^<<^^")).toString() shouldBe """
+            ##############
+            ##...[].##..##
+            ##...@.[]...##
+            ##....[]....##
+            ##..........##
+            ##..........##
+            ##############
+        """.trimIndent()
+    }
+
+    private val largeSampleScaledResult = Warehouse.parse(
+        """
+                ####################
+                ##[].......[].[][]##
+                ##[]...........[].##
+                ##[]........[][][]##
+                ##[]......[]....[]##
+                ##..##......[]....##
+                ##..[]............##
+                ##..@......[].[][]##
+                ##......[][]..[]..##
+                ####################
+            """.trimIndent()
+    )
+
+    @Test
+    fun `larger sample scaled also works`() {
+        Warehouse.execute(
+            scaled = true,
             """
             ##########
             #..O..O.O#
@@ -158,18 +263,17 @@ class WarehouseTest {
             ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
             v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
         """.trimIndent()
-        ) shouldBe largeExampleResult
+        ) shouldBe largeSampleScaledResult
     }
 
     @Test
-    fun `gps sum`() {
-        largeExampleResult.sumOfGPS shouldBe 10092
-        smallSampleResult.sumOfGPS shouldBe 2028
+    fun `correct scoring for scaled`() {
+        largeSampleScaledResult.sumOfGPS shouldBe 9021
     }
 
     @Test
-    fun part1() {
-        Warehouse.execute(AOC.getInput("/2024/day15.txt")).sumOfGPS shouldBe 1429911L
+    fun part2() {
+        Warehouse.execute(scaled = true, mapAndDirections = input).sumOfGPS shouldBe 1453087L
     }
 }
 
