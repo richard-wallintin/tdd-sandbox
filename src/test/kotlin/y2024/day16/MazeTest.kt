@@ -57,37 +57,49 @@ class MazeTest {
         rotated.move() shouldBe null
     }
 
+    private val sample2 = Maze.parse(
+        """
+                #################
+                #...#...#...#..E#
+                #.#.#.#.#.#.#.#.#
+                #.#.#.#...#...#.#
+                #.#.#.#.###.#.#.#
+                #...#.#.#.....#.#
+                #.#.#.#.#.#####.#
+                #.#...#.#.#.....#
+                #.#.#####.#.###.#
+                #.#.#.......#...#
+                #.#.###.#####.###
+                #.#.#...#.....#.#
+                #.#.#.#####.###.#
+                #.#.#.........#.#
+                #.#.#.#########.#
+                #S#.............#
+                #################
+            """.trimIndent()
+    )
+
     @Test
     fun search() {
         sample1.bestPathScore shouldBe 7036
+        sample2.bestPathScore shouldBe 11048
+    }
 
-        Maze.parse(
-            """
-            #################
-            #...#...#...#..E#
-            #.#.#.#.#.#.#.#.#
-            #.#.#.#...#...#.#
-            #.#.#.#.###.#.#.#
-            #...#.#.#.....#.#
-            #.#.#.#.#.#####.#
-            #.#...#.#.#.....#
-            #.#.#####.#.###.#
-            #.#.#.......#...#
-            #.#.###.#####.###
-            #.#.#...#.....#.#
-            #.#.#.#####.###.#
-            #.#.#.........#.#
-            #.#.#.#########.#
-            #S#.............#
-            #################
-        """.trimIndent()
-        ).bestPathScore shouldBe 11048
+
+    private val inputMaze = Maze.parse(AOC.getInput("/2024/day16.txt"))
+    @Test
+    fun part1() {
+        inputMaze.bestPathScore shouldBe 109496
     }
 
     @Test
-    fun part1() {
-        val inputMaze = Maze.parse(AOC.getInput("/2024/day16.txt"))
+    fun `determine all best path tiles`() {
+        sample1.bestPathTiles shouldBe 45
+        sample2.bestPathTiles shouldBe 64
+    }
 
-        inputMaze.bestPathScore shouldBe 109496
+    @Test
+    fun part2() {
+        inputMaze.bestPathTiles shouldBe 551
     }
 }
