@@ -2,7 +2,6 @@ package y2024.day17
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import util.power
 
 class CSCTest {
 
@@ -92,31 +91,59 @@ class CSCTest {
                 "4,6,3,5,6,3,5,2,1,0"
     }
 
+    private val inputComputer = CSC(
+        registerA = 18427963,
+        program = listOf(
+            2, 4, // bst: B = A % 8
+            1, 1, // bxl: B = B xor 1
+            7, 5, // cdv: C = A / 2^B = A >> B
+            0, 3, // adv: A = A / 2^3 = A >> 3
+            4, 3, // bxc: B = B xor C
+            1, 6, // bxl: B = B xor 6
+            5, 5, // out: output(B % 8)
+            3, 0 // jnz - 0 start again if A > 0
+        )
+    )
+
     @Test
     fun part1() {
-        //Register A: 18427963
-        //Register B: 0
-        //Register C: 0
-        //
-        //Program: 2,4,1,1,7,5,0,3,4,3,1,6,5,5,3,0
-        CSC(
-            registerA = 18427963,
-            program = listOf(2, 4, 1, 1, 7, 5, 0, 3, 4, 3, 1, 6, 5, 5, 3, 0)
-        ).exec().outputAsString shouldBe
+        inputComputer.exec().outputAsString shouldBe
                 "2,0,7,3,0,3,1,3,7"
+    }
+
+    @Test
+    fun `self-reproducing example`() {
+        val selfReproducing = CSC(
+            registerA = 117440,
+            program = listOf(0, 3, 5, 4, 3, 0)
+        )
+        selfReproducing.exec().outputAsString shouldBe "0,3,5,4,3,0"
+        selfReproducing.copiesProgram shouldBe true
+    }
+
+    @Test
+    fun `compute ideal register-a value`() {
+        CSC(
+            program = listOf(0, 3, 5, 4, 3, 0)
+        ).selfCopyRegisterA shouldBe 117440
+    }
+
+    @Test
+    fun part2() {
+        inputComputer.selfCopyRegisterA shouldBe 247839539763386L
     }
 }
 
 data class CSC(
-    val registerA: Int = 0,
-    val registerB: Int = 0,
-    val registerC: Int = 0,
+    val registerA: Long = 0,
+    val registerB: Long = 0,
+    val registerC: Long = 0,
     val program: List<Int> = emptyList(),
     val pointer: Int = 0,
     val output: List<Int> = emptyList(),
 ) {
     private fun combo(operand: Int) = when (operand) {
-        in 0..3 -> operand
+        in 0..3 -> operand.toLong()
         4 -> registerA
         5 -> registerB
         6 -> registerC
@@ -125,28 +152,30 @@ data class CSC(
 
     fun adv(operand: Int) = copy(registerA = dv(operand))
 
-    private fun dv(operand: Int) = registerA / 2.power(combo(operand))
+    private fun dv(operand: Int) = registerA shr combo(operand).toInt()
 
-    fun bxl(operand: Int) = copy(registerB = registerB xor operand)
-    fun bst(operand: Int) = copy(registerB = combo(operand) % 8)
+    fun bxl(operand: Int) = copy(registerB = registerB xor operand.toLong())
+    fun bst(operand: Int) = copy(registerB = combo(operand) and 7)
 
     fun jnz(operand: Int): CSC {
-        return if (registerA == 0) next()
+        return if (registerA == 0L) next()
         else copy(pointer = operand)
     }
 
     fun bxc() = copy(registerB = registerB xor registerC)
-    fun out(operand: Int) = copy(output = output + (combo(operand) % 8))
+    fun out(operand: Int) = copy(output = output + (combo(operand).toInt() and 7))
     fun bdv(operand: Int) = copy(registerB = dv(operand))
     fun cdv(operand: Int) = copy(registerC = dv(operand))
 
-    fun exec() = sequence<CSC> {
+    fun exec() = compute().last()
+
+    private fun compute() = sequence<CSC> {
         var x: CSC? = this@CSC
         while (x != null) {
             yield(x)
             x = x.step()
         }
-    }.last()
+    }
 
     private fun step(): CSC? {
         if (pointer in program.indices) {
@@ -173,4 +202,22 @@ data class CSC(
     private fun next(): CSC = copy(pointer = pointer + 2)
 
     val outputAsString by lazy { output.joinToString(",") }
+
+    val selfCopyRegisterA: Long by lazy {
+        var test = 0L
+        program.indices.reversed().forEach { i ->
+            // this approach relies on the fact that the program will always shift A by 3 bits
+            // for every output number
+            test = test shl 3
+            while (copy(registerA = test).exec().output != program.drop(i))
+                test++
+        }
+        return@lazy test
+    }
+
+    val copiesProgram: Boolean by lazy {
+        compute().takeWhile {
+            it.output == program.take(it.output.size)
+        }.lastOrNull()?.output == program
+    }
 }
