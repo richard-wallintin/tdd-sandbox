@@ -64,6 +64,9 @@ class MemorySpaceTest {
     @Test
     fun part2() {
         val start = largeSpace.dropAll(inputBytes.take(1024))
+        // could do something more clever here (binary search)
+        // or analysing the nodes on the shortest path
+        // BUT this works in < 5 sec, so 🤷‍♂️
         val blocked = inputBytes.drop(1024).runningFold(start, MemorySpace::drop).dropWhile {
             it.shortestPath() != null
         }.first()
