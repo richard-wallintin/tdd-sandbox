@@ -3,6 +3,7 @@ package y2024.day19
 import AOC
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import util.Memo
 
 class TowelTest {
 
@@ -52,8 +53,8 @@ class TowelTest {
 
     @Test
     fun part1() {
-        val cache = mutableMapOf<StripePattern, Long>()
-        inputDesigns.count { it.canBeArranged(inputTowels, cache) } shouldBe 317
+        val memo = Memo<StripePattern, Long>()
+        inputDesigns.count { it.canBeArranged(inputTowels, memo) } shouldBe 317
     }
 
     @Test
@@ -64,11 +65,11 @@ class TowelTest {
 
     @Test
     fun part2() {
-        val cache = mutableMapOf<StripePattern, Long>()
+        val memo = Memo<StripePattern, Long>()
         inputDesigns.sumOf {
-            it.recursiveCountArrangements(
+            it.countArrangements(
                 inputTowels,
-                cache
+                memo
             )
         } shouldBe 883443544805484L
     }

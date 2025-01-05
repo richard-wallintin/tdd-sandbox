@@ -1,32 +1,28 @@
 package y2024.day19
 
+import util.Memo
+
 @JvmInline
 value class StripePattern(private val colors: String) {
     private val length get() = colors.length
 
     fun canBeArranged(
         patterns: List<StripePattern>,
-        cache: MutableMap<StripePattern, Long> = mutableMapOf(),
-    ): Boolean {
-        return recursiveCountArrangements(patterns, cache) > 0
-    }
+        cache: Memo<StripePattern, Long> = Memo(),
+    ) = countArrangements(patterns, cache) > 0
 
-    fun countArrangements(patterns: List<StripePattern>): Long {
-        return recursiveCountArrangements(patterns)
-    }
-
-    fun recursiveCountArrangements(
+    fun countArrangements(
         patterns: List<StripePattern>,
-        cache: MutableMap<StripePattern, Long> = mutableMapOf(),
+        cache: Memo<StripePattern, Long> = Memo(),
     ): Long {
         return if (length == 0) 1L
-        else cache[this] ?: run {
+        else cache.recall(this) {
             patterns.filter {
                 isPrefix(it)
             }.sumOf {
-                removePrefix(it).recursiveCountArrangements(patterns, cache)
+                removePrefix(it).countArrangements(patterns, cache)
             }
-        }.also { cache[this] = it }
+        }
     }
 
     private fun removePrefix(p: StripePattern) = StripePattern(colors.removePrefix(p.colors))
