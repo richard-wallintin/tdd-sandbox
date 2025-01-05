@@ -3,6 +3,8 @@ package util
 import java.util.*
 
 data class GridPath(val points: List<Point>) {
+    val steps get() = points.zipWithNext()
+
     private val location = points.last()
     val length = points.size - 1
 
