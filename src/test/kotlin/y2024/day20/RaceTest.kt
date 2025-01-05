@@ -42,14 +42,25 @@ class RaceTest {
 
     @Test
     fun `find cheat paths`() {
-        sampleTrack.cheatPaths.sorted().onEach { println("$it") }.count() shouldBe 44
+        sampleTrack.cheatPaths.sorted().count() shouldBe 44
     }
+
+    private val racetrack = Racetrack.parse(AOC.getInput("/2024/day20.txt"))
 
     @Test
     fun part1() {
-        val racetrack = Racetrack.parse(AOC.getInput("/2024/day20.txt"))
-
         racetrack.cheatPaths.count { it >= 100 } shouldBe 1507
+    }
+
+    @Test
+    fun `advanced cheat paths`() {
+        sampleTrack.advancedCheats(50).count { it == 76 } shouldBe 3
+        sampleTrack.advancedCheats(50).count { it == 74 } shouldBe 4
+    }
+
+    @Test
+    fun part2() {
+        racetrack.advancedCheats(100).count { it >= 100 } shouldBe 1037936
     }
 }
 
@@ -90,6 +101,26 @@ data class Racetrack(
         }
     }
 
+    fun advancedCheats(targetOptimization: Int = 50) = sequence {
+        defaultPath.points.forEachIndexed { timeToP, p ->
+            // we care about any chance to save at least 50 picos
+            defaultPath.points.withIndex()
+                .drop(timeToP + targetOptimization).reversed()
+                .forEach { (defaultTimeToGoal, goal) ->
+
+                    val shortcutDuration = p.distance(goal).toInt()
+                    if (shortcutDuration <= 20) {
+                        val shortcutTimeToGoal =
+                            timeToP + shortcutDuration
+
+                        if (defaultTimeToGoal > shortcutTimeToGoal) {
+                            yield(defaultTimeToGoal - shortcutTimeToGoal)
+                        }
+                    }
+                }
+        }
+    }
+
     companion object {
         fun parse(text: String): Racetrack {
             val grid = Grid.charGridOf(text)
@@ -106,5 +137,4 @@ data class Racetrack(
             )
         }
     }
-
 }
