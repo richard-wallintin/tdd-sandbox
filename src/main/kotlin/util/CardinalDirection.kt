@@ -54,5 +54,7 @@ enum class CardinalDirection(val x: Int, val y: Int) {
                 else -> throw IllegalArgumentException("unknown direction $s")
             }
         }
+
+        fun List<CardinalDirection>.inverse() = map { it.inverse }.reversed()
     }
 }
