@@ -10,10 +10,12 @@ import org.junit.jupiter.api.Test
 import util.CardinalDirection
 import util.CardinalDirection.*
 import util.CardinalDirection.Companion.inverse
-import util.forever
+import util.Memo
+import util.chunkedBy
+import util.combine
 import y2024.day21.DirectionalKey.Companion.compact
 import y2024.day21.DirectionalKey.Companion.moves
-import y2024.day21.Key.Companion.combine
+import y2024.day21.DirectionalKey.Companion.presses
 import y2024.day21.Key.Companion.inverse
 import y2024.day21.NumericKey.Companion.moves
 import y2024.day21.NumericKey.Companion.moves3
@@ -158,6 +160,14 @@ class KeypadTest {
             .compact() shouldContain "<v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A"
     }
 
+    private val sampleCodes = """
+        029A
+        980A
+        179A
+        456A
+        379A
+    """.trimIndent().lineSequence()
+
     @Test
     fun `compute complexity`() {
         NumericKey.complexity("029A") shouldBe 68 * 29
@@ -165,6 +175,9 @@ class KeypadTest {
         NumericKey.complexity("179A") shouldBe 68 * 179
         NumericKey.complexity("456A") shouldBe 64 * 456
         NumericKey.complexity("379A") shouldBe 64 * 379
+
+
+        sampleCodes.sumOf { NumericKey.complexity(it) } shouldBe 126384
     }
 
     private val codes = """
@@ -181,8 +194,17 @@ class KeypadTest {
     }
 
     @Test
+    fun `compute key presses`() {
+        NumericKey.presses("029A", order = 2) shouldBe 68
+        NumericKey.presses("980A", order = 2) shouldBe 60
+        NumericKey.presses("179A", order = 2) shouldBe 68
+        NumericKey.presses("456A", order = 2) shouldBe 64
+        NumericKey.presses("379A", order = 2) shouldBe 64
+    }
+
+    @Test
     fun part2() {
-        codes.sumOf { NumericKey.highComplexity(it) } shouldBe 42
+        codes.sumOf { NumericKey.highComplexity(it) } shouldBe 223285811665866L
     }
 }
 
@@ -196,8 +218,6 @@ interface Key<T : Key<T>> {
 
     companion object {
         fun PossibleMovements.inverse() = map { it.inverse() }.toSet()
-        infix fun <T> Iterable<List<T>>.combine(b: Iterable<List<T>>): List<List<T>> =
-            flatMap { x -> b.map { y -> x + y } }
     }
 }
 
@@ -274,6 +294,30 @@ enum class DirectionalKey : Key<DirectionalKey> {
                 RIGHT -> ">"
                 A -> "A"
             }
+        }
+
+        data class MemoKey(val stroke: List<DirectionalKey>, val order: Int)
+
+        fun PossibleKeys<DirectionalKey>.presses(
+            order: Int,
+            memo: Memo<MemoKey, Long> = Memo(),
+        ): Long = minOf { it.presses(order, memo) }
+
+        private fun List<DirectionalKey>.presses(
+            order: Int,
+            memo: Memo<MemoKey, Long>,
+        ): Long {
+            return if (order == 0) size.toLong()
+            else asSequence().chunkedBy(keepDelimiter = true) { it == A }
+                .sumOf { stroke -> strokePresses(stroke, order, memo) }
+        }
+
+        private fun strokePresses(
+            stroke: List<DirectionalKey>,
+            order: Int,
+            memo: Memo<MemoKey, Long>,
+        ) = memo.recall(MemoKey(stroke, order)) {
+            stroke.moves(A).presses(order - 1, memo)
         }
     }
 }
@@ -392,11 +436,15 @@ enum class NumericKey : Key<NumericKey> {
 
         fun List<NumericKey>.moves() = moves(KEY_A)
         fun List<NumericKey>.moves3() = moves().moves().moves()
-        private fun List<NumericKey>.moves26() = moves().forever { moves() }.take(25).last()
 
-        fun complexity(code: String) = of(code).moves3().first().size * numericValue(code)
-        fun highComplexity(code: String) = of(code).moves26().first().size * numericValue(code)
+        fun complexity(code: String) = presses(code, order = 2) * numericValue(code)
+        fun highComplexity(code: String) = presses(code, order = 25) * numericValue(code)
 
         private fun numericValue(code: String) = code.filter { it.isDigit() }.toInt()
+        fun presses(code: String, order: Int): Long {
+            val base = of(code).moves()
+
+            return base.presses(order)
+        }
     }
 }

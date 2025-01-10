@@ -17,20 +17,25 @@ fun Iterable<String>.integers() = filter { it.isNotBlank() }.map { it.toInt() }
 fun String.longs() = split().longs()
 fun Iterable<String>.longs() = filter { it.isNotBlank() }.map { it.toLong() }
 
-fun <T> Sequence<T>.chunkedBy(predicate: (T) -> Boolean) = sequence<List<T>> {
-    val collect = mutableListOf<T>()
-    this@chunkedBy.forEach {
-        if (predicate(it)) {
-            if (collect.isNotEmpty()) yield(collect.toList())
-            collect.clear()
-        } else collect.add(it)
+fun <T> Sequence<T>.chunkedBy(keepDelimiter: Boolean = false, predicate: (T) -> Boolean) =
+    sequence<List<T>> {
+        val collect = mutableListOf<T>()
+        this@chunkedBy.forEach {
+            if (predicate(it)) {
+                if (keepDelimiter) collect.add(it)
+                if (collect.isNotEmpty()) yield(collect.toList())
+                collect.clear()
+            } else collect.add(it)
+        }
+        if (collect.isNotEmpty()) yield(collect)
     }
-    if (collect.isNotEmpty()) yield(collect)
-}
 
 fun <T> List<List<T>>.transpose(): List<List<T>> {
     return (this[0].indices).map { i -> (this.indices).map { j -> this[j][i] } }
 }
+
+infix fun <T> Iterable<List<T>>.combine(b: Iterable<List<T>>): List<List<T>> =
+    flatMap { x -> b.map { y -> x + y } }
 
 fun lcm(a: BigInteger, b: BigInteger): BigInteger {
     val gcd = a.gcd(b)
